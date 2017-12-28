@@ -22,6 +22,7 @@
 #     print('The lists are equal')
 # else:
 #     print('The list are not equal')
+
 #
 # list_1 = []
 # list_2 = list()
@@ -47,3 +48,17 @@ for nums in number:
 
     for val in nums:
         print(val)
+
+menu = []
+menu.append(['egg', 'spam', 'bacon'])
+menu.append(['egg', 'sausage', 'baconn'])
+menu.append(['egg', 'spam', 'bascon'])
+menu.append(['egg', 'bacon', 'sausage', 'spam'])
+menu.append(['spam', 'egg', 'spam', 'bacon', 'spam'])
+
+print(menu)
+
+for meal in menu:
+    if not 'spam' in meal:
+        for item in meal:
+            print(item)
