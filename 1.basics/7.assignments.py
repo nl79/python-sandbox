@@ -33,6 +33,14 @@
 # print(msg)
 #
 
+a = b = c =d = 12
+
+a, b = 12, 13
+print(a)
+print(b)
+
+a, b = b, a
+
 ip = input('Enter an IP Address ')
 temp = '';
 count = 0;
