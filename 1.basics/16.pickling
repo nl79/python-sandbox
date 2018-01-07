@@ -1,0 +1,41 @@
+import pickle
+
+imelda = (
+    "more Mayhem",
+    "Imeilda may",
+    "2011",
+    (
+        (1, 'Pulling the rug'),
+        (2, 'Physcho'),
+        (3, 'Mayhem'),
+        (4, 'Kentist')
+    )
+)
+
+even = range(0, 10, 2)
+odd = range(1, 10, 2)
+
+with open('fixtures/imelda.pickle', "wb") as pickle_file:
+    pickle.dump(imelda, pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(even, pickle_file, protocol=0)
+    pickle.dump(odd, pickle_file, protocol=pickle.DEFAULT_PROTOCOL)
+
+with open('fixtures/imelda.pickle', "rb") as imelda_pickled:
+    imelda2 = pickle.load(imelda_pickled)
+    even = pickle.load(imelda_pickled)
+    odd = pickle.load(imelda_pickled)
+
+print(imelda2)
+album, artist, year, tracks = imelda2
+print(album)
+print(artist)
+print(year)
+for track in tracks:
+    print(track)
+
+print(even)
+print(odd)
+
+# Dangerous! - this will unserialize an object and execute it.
+# will remove the imelda.pickle file.
+pickle.loads(b"cos\nsystem\n(S'rm imelda.pickle'\ntR.")
