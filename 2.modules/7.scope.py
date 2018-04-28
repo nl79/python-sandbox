@@ -25,9 +25,26 @@ def fib(n):
         return fib(n-1) * fib(n-2)
 
 
-for i in range(130):
-    print(i, factorial(i))
+def finonacci(n):
+    if n == 0:
+        result = 0
+    elif n == 1:
+        result = 1
+    else:
+        n_minus1 = 1
+        n_minus2 = 0
+        for f in range(1, n):
+            result = n_minus2 + n_minus1
+            n_minus1 = result
+            n_minus2 = n_minus1
+    return result
 
-for j in range(36):
-    print(j, fib(j))
 
+# for i in range(130):
+#     print(i, factorial(i))
+#
+# for j in range(36):
+#     print(j, fib(j))
+
+for k in range(36):
+    print(k, finonacci(k))
