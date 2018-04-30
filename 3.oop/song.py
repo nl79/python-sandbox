@@ -1,3 +1,5 @@
+#from __future__ import print_function
+
 class Song:
     """Class to represent a song
     
@@ -50,6 +52,15 @@ class Artist:
         self.albums.append(album)
 
 
+def find_object(field, object_list):
+    """Check 'object_list' to see if an object with a name 'field' exists and return it if so"""
+    for item in object_list:
+        if item.name == field:
+            return item
+
+    return None
+
+
 def load_data():
     new_artist = None
     new_album = None
@@ -64,32 +75,34 @@ def load_data():
 
             if(new_artist is None):
                 new_artist = Artist(artist_field)
+                artist_list.append(new_artist)
+
             elif new_artist.name != artist_field:
                 # we've just read details for a new artist
-                # store the current album in the current artists collection then create a new arist object
-                new_artist.add_album(new_album)
-                artist_list.append(new_artist)
-                new_artist = Artist(artist_field)
+                # retrieve the artist object if there is one.
+                # otherwise create a new artist object and add it to the artist list.
+                new_artist = find_object(artist_field, artist_list)
+                if new_artist is None:
+                    new_artist = Artist(artist_field)
+                    artist_list.append(new_artist)
                 new_album = None
 
             if new_album is None:
                 new_album = Album(album_field, year_field, new_artist)
+                new_artist.add_album(new_album)
+
             elif new_album.name != album_field:
                 # we've just read a new album for the current artist
-                # store the current album in the artist collection and create a new album object.
-                new_artist.add_album(new_album)
-                new_album = Album(album_field, year_field, new_artist)
+                # retrieve the album object if there is one.
+                # otherwise create a new album object and store it in the artists collection.
+                new_album = find_object(album_field, new_artist.albums)
+                if new_album is None:
+                    new_album = Album(album_field, year_field, new_artist)
+                    new_artist.add_album(new_album)
 
             # create a new song object and add it to the current albumb collection.
             new_song = Song(song_field, new_artist)
             new_album.add_song(new_song)
-
-        # after reading the last line of the textfile, we will have an artist and album that haven't been stored
-        # process them now.
-        if new_artist is not None:
-            if new_album is not None:
-                new_artist.add_album(new_album)
-            artist_list.append(new_artist)
 
     return artist_list
 
