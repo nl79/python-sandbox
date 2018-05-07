@@ -21,6 +21,11 @@ class Song:
         self.artist = artist
         self.duration = duration
 
+    def get_title(self):
+        return self.title
+
+    name = property(get_title)
+
 
 class Album:
 
@@ -28,18 +33,21 @@ class Album:
         self.name = name
         self.year = year
         if artist is None:
-            self.artist = Artist("Various Artists")
+            self.artist = "Various Artists"
         else:
             self.artist = artist
 
         self.tracks = []
 
     def add_song(self, song, position=None):
+        song_found = find_object(song, self.tracks)
 
-        if position is None:
-            self.tracks.append(song)
-        else:
-            self.tracks.insert(position, song)
+        if song_found is None:
+            song_found = Song(song, self.artist)
+            if position is None:
+                self.tracks.append(song_found)
+            else:
+                self.tracks.insert(position, song_found)
 
 
 class Artist:
@@ -55,7 +63,7 @@ class Artist:
         album_found = find_object(name, self.albums)
         if album_found is None:
             print(name + " Not found")
-            album_found = Album(name, year, self)
+            album_found = Album(name, year, self.name)
             self.add_album(album_found)
         else:
             print("Found album " + name)
