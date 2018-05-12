@@ -1,5 +1,5 @@
 from player import Player
-from enemy import Enemy, Troll, Vampyre
+from enemy import Enemy, Troll, Vampyre, VampyreKing
 
 random_monster = Enemy("Basic enemy", 12, 1)
 print(random_monster)
@@ -25,6 +25,10 @@ vamp = Vampyre("Vlad")
 vamp.take_damage(7)
 print(vamp)
 
+king = VampyreKing("Dracula")
+
+
 while vamp._alive:
     vamp.take_damage(1)
-    print(vamp)
+    king.take_damage(10)
+    print(king)
