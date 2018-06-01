@@ -105,7 +105,7 @@ def create_chechfile(artist_list):
 
 if __name__ == "__main__":
     artists = load_data()
- 
+
     print("there are {} artists".format(len(artists)))
 
     create_chechfile(artists)
