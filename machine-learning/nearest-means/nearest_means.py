@@ -1,6 +1,5 @@
 import sys
 
-
 #### Read Data
 def readData(filename):
     file = open(filename)
@@ -67,11 +66,11 @@ def computeMeans(data, labels):
     for i in range(0, rows, 1):
 
         # get the row class value
-        c = str(labels.get(i))
+        c = labels.get(i)
 
         # If class exists, sum up the data values for that row and that class.
         if c != None:
-            current = means.get(c)
+            current = means.get(str(c))
             for j in range(0, cols, 1):
                 current[j] += data[i][j]
 
@@ -83,27 +82,58 @@ def computeMeans(data, labels):
     return means
 
 
-def classify(data, labels):
-
+def classify(data, labels, means):
     rows = len(data)
-    cols = len(data[0])
+    if rows == 0:
+        return False
 
+    cols = len(data[0])
     classes = labels.get('classes')
     labels = labels.get('labels')
 
-    ### Classify unlableed points
+    # Iterate over every row
     for i in range(0, rows, 1):
-        if(labels.get(i) == None):
-            d0 = 0
-            d1 = 0
-            for j in range(0, cols, 1):
-                d0 = d0 + ( m0[j] - data[i][j])**2
-                d1 = d1 + ( m1[j] - data[i][j])**2
 
-            if(d0 < d1):
-                print('0 ', i)
-            else:
-                print('1 ', i)
+        # Initialize the deviation collection
+        # Zero out the deviation values for each row.
+        d = {}
+        for key in classes:
+            d.setdefault(key, 0)
+
+        # Iterate over every column
+        for j in range(0, cols, 1):
+            for key in classes:
+                d[key] += (means.get(key)[j] - data[i][j])**2
+
+            # Calculate the max
+            max = 0
+            c = None
+            for key in d:
+                if d[key] > max:
+                    max = d[key]
+                    c = key
+
+            print('{} {}'.format(c, i))
+
+    return False
+
+
+# Splits the input data into the classified(training data) and
+# unclassified (test data)
+def splitData(data, labels):
+
+    training = []
+    test = []
+    labels = labels.get('labels')
+
+    for i in range(0, len(data), 1):
+
+        if(labels.get(i) == None):
+            test.append(data[i])
+        else:
+            training.append(data[i])
+
+    return {"training": training, "test": test}
 
 
 if __name__ == "__main__":
@@ -116,18 +146,28 @@ if __name__ == "__main__":
     datafile = sys.argv[1]
     labelfile = sys.argv[2]
 
+    traindata = []
+    testdata = []
+
     #read datafile
     data = readData(datafile)
 
     #read labelfile
     labels = readLabels(labelfile)
-    # counts = labels.get('counts')
-    # labels = labels.get('labels')
+
+    # If no unclassified data is supplied, try to extract it from the initial
+    # data input
+    if len(sys.argv) >= 4:
+        testfile = sys.argv[3]
+        testdata = readData(testfile)
+        traindata = data
+    else:
+        data = splitData(data, labels)
+        testdata = data.get("test")
+        traindata = data.get("training")
 
     #compute means
-    means = computeMeans(data,labels)
-    print('means', means)
+    means = computeMeans(traindata,labels)
 
-    #print('label.classes', labels.get('classes'))
-    #print('means', means)
-    print('here');
+    # Classify
+    classes = classify(testdata, labels, means)
