@@ -1,3 +1,5 @@
+#from __future__ import print_function
+
 class Song:
     """Class to represent a song
     
@@ -19,6 +21,11 @@ class Song:
         self.artist = artist
         self.duration = duration
 
+    def get_title(self):
+        return self.title
+
+    name = property(get_title)
+
 
 class Album:
 
@@ -26,18 +33,21 @@ class Album:
         self.name = name
         self.year = year
         if artist is None:
-            self.artist = Artist("Various Artists")
+            self.artist = "Various Artists"
         else:
             self.artist = artist
 
         self.tracks = []
 
     def add_song(self, song, position=None):
+        song_found = find_object(song, self.tracks)
 
-        if position is None:
-            self.tracks.append(song)
-        else:
-            self.tracks.insert(position, song)
+        if song_found is None:
+            song_found = Song(song, self.artist)
+            if position is None:
+                self.tracks.append(song_found)
+            else:
+                self.tracks.insert(position, song_found)
 
 
 class Artist:
@@ -49,10 +59,28 @@ class Artist:
     def add_album(self, album):
         self.albums.append(album)
 
+    def add_song(self, name, year, title):
+        album_found = find_object(name, self.albums)
+        if album_found is None:
+            print(name + " Not found")
+            album_found = Album(name, year, self.name)
+            self.add_album(album_found)
+        else:
+            print("Found album " + name)
+
+        album_found.add_song(title)
+
+
+def find_object(field, object_list):
+    """Check 'object_list' to see if an object with a name 'field' exists and return it if so"""
+    for item in object_list:
+        if item.name == field:
+            return item
+
+    return None
+
 
 def load_data():
-    new_artist = None
-    new_album = None
     artist_list = []
 
     with open("./fixtures/albums.txt") as albums:
@@ -62,35 +90,12 @@ def load_data():
             year_field = int(year_field)
             print("{}:{}:{}:{}".format(artist_field, album_field, year_field, song_field))
 
-            if(new_artist is None):
+            new_artist = find_object(artist_field, artist_list)
+            if new_artist is None:
                 new_artist = Artist(artist_field)
-            elif new_artist.name != artist_field:
-                # we've just read details for a new artist
-                # store the current album in the current artists collection then create a new arist object
-                new_artist.add_album(new_album)
                 artist_list.append(new_artist)
-                new_artist = Artist(artist_field)
-                new_album = None
 
-            if new_album is None:
-                new_album = Album(album_field, year_field, new_artist)
-            elif new_album.name != album_field:
-                # we've just read a new album for the current artist
-                # store the current album in the artist collection and create a new album object.
-                new_artist.add_album(new_album)
-                new_album = Album(album_field, year_field, new_artist)
-
-            # create a new song object and add it to the current albumb collection.
-            new_song = Song(song_field, new_artist)
-            new_album.add_song(new_song)
-
-        # after reading the last line of the textfile, we will have an artist and album that haven't been stored
-        # process them now.
-        if new_artist is not None:
-            if new_album is not None:
-                new_artist.add_album(new_album)
-            artist_list.append(new_artist)
-
+            new_artist.add_song(album_field, year_field, song_field)
     return artist_list
 
 
