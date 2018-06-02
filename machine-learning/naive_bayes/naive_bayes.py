@@ -1,4 +1,5 @@
 import sys
+import math
 
 class NaiveBayes(object):
 
@@ -9,8 +10,9 @@ class NaiveBayes(object):
         self._cols = len(data[0])
         self._classes = self.aggregateClasses()
         self._means = self.means()
+        self._deviations = self.deviations()
 
-        print(self._means)
+        print(self._deviations)
 
 
     def aggregateClasses(self):
@@ -34,7 +36,6 @@ class NaiveBayes(object):
         classes = self._classes
         rows = self._rows
 
-        print()
         ### Compute means
         # build the means dict and initialize the class list of attribute vaues to 0
         means = {}
@@ -46,11 +47,14 @@ class NaiveBayes(object):
             # get the row class value
             c = labels.get(i)
 
+            # if unclassified, continue
+            if c == None:
+                continue
+
             # If class exists, sum up the data values for that row and that class.
-            if c != None:
-                current = means.get(str(c))
-                for j in range(0, self._cols, 1):
-                    current[j] += data[i][j]
+            current = means.get(str(c))
+            for j in range(0, self._cols, 1):
+                current[j] += data[i][j]
 
         # Calculate the means.
         for j in range(0, self._cols, 1):
@@ -59,10 +63,49 @@ class NaiveBayes(object):
 
         return means
 
-    # Calculate the variance matrix for a row.
-    def variance(row, means, classes):
 
-        return True
+    # Calculate the variance matrix for a row.
+    def deviations(self):
+
+        data = self._data
+        classes = self._classes
+        means = self._means
+        rows = len(data)
+
+        # Initialize the deviations collection.
+        deviations = {}
+        for key in classes:
+            deviations.setdefault(str(key), [0]*self._cols)
+
+        for i in range(0, rows, 1):
+
+            # get the row class value
+            c = labels.get(i)
+
+            # If the row is unclassified, skip it.
+            if c == None:
+                continue
+
+            for j in range(0, self._cols, 1):
+
+                # Convert the class to a string to key into the dictionary
+                c = str(c)
+
+                # get the current value form the data
+                value = data[i][j]
+
+                # get the mean value from the means dictionary
+                mean = means.get(c)[j]
+
+                deviations[c][j] += (mean - value)**2
+
+        # Calculate the deviation.
+        for j in range(0, self._cols, 1):
+            for c in classes:
+                deviations[c][j] = math.sqrt(deviations[c][j] /classes[c])
+
+        return deviations
+
 
     def classify(data):
         rows = len(data)
@@ -70,8 +113,7 @@ class NaiveBayes(object):
             return False
 
         cols = len(data[0])
-        classes = labels.get('classes')
-        labels = labels.get('labels')
+        classes = self._classes
 
         # Iterate over every row
         for i in range(0, rows, 1):
