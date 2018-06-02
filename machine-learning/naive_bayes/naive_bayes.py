@@ -107,13 +107,15 @@ class NaiveBayes(object):
         return deviations
 
 
-    def classify(data):
+    def classify(self, data):
         rows = len(data)
         if rows == 0:
             return False
 
         cols = len(data[0])
         classes = self._classes
+        deviations = self._deviations
+        means = self._means
 
         # Iterate over every row
         for i in range(0, rows, 1):
@@ -125,23 +127,25 @@ class NaiveBayes(object):
                 d.setdefault(key, 0)
 
             # Iterate over every column
-            for j in range(0, cols, 1):
-                for key in classes:
-                    d[key] += (means.get(key)[j] - data[i][j])**2
+            for k in range(0, cols, 1):
 
-                # Calculate the max
-                max = 0
-                c = None
-                for key in d:
-                    if d[key] > max:
-                        max = d[key]
-                        c = key
+                for j in classes:
+                    d[j] += ((data[i][k] - means.get(j)[k]) / deviations.get(j)[k] )**2
 
-                print('{} {}'.format(c, i))
+            # Calculate the max
+            min = 0
+            c = None
+
+            print('d', d)
+            for key in d:
+                print()
+                if d[key] < min:
+                    min = d[key]
+                    c = key
+
+            print('{} {}'.format(c, i))
 
         return False
-
-
 
 
 
@@ -232,8 +236,9 @@ if __name__ == "__main__":
 
 
     bayes = NaiveBayes(traindata, labels)
-    #compute means
-    #means = computeMeans(traindata,labels)
+
+    #classify
+    classification = bayes.classify(testdata)
 
     # Classify
     #classes = classify(testdata, labels, means)
