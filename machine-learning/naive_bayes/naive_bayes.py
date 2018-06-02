@@ -104,11 +104,6 @@ class NaiveBayes(object):
         return deviations
 
     def classify(self, data):
-        rows = len(data)
-        if rows == 0:
-            return False
-
-        cols = len(data[0])
         classes = self._classes
         deviations = self._deviations
         means = self._means
@@ -116,7 +111,9 @@ class NaiveBayes(object):
         results = [];
 
         # Iterate over every row
-        for i in range(0, rows, 1):
+        for i in data:
+
+            row = data[i]
 
             # Initialize the deviation collection
             # Zero out the deviation values for each row.
@@ -125,10 +122,10 @@ class NaiveBayes(object):
                 d.setdefault(key, 0)
 
             # Iterate over every column
-            for k in range(0, cols, 1):
+            for k in range(0, len(row), 1):
 
                 for j in classes:
-                    d[j] += ((data[i][k] - means.get(j)[k]) / deviations.get(j)[k] )**2
+                    d[j] += ((row[k] - means.get(j)[k]) / deviations.get(j)[k] )**2
 
             # Calculate the min
             min = float("inf")
@@ -143,7 +140,7 @@ class NaiveBayes(object):
 
             # Save the data and its classifier
             results.append({
-                "data": data[i],
+                "data": row,
                 "class": c
             })
 
@@ -194,12 +191,12 @@ def readLabels(filename):
 def splitData(data, labels):
 
     training = []
-    test = []
+    test = {}
 
     for i in range(0, len(data), 1):
 
         if(labels.get(i) == None):
-            test.append(data[i])
+            test.setdefault(i, data[i])
         else:
             training.append(data[i])
 
@@ -238,6 +235,7 @@ if __name__ == "__main__":
 
     bayes = NaiveBayes(traindata, labels)
 
+    print('testdata', testdata)
     #classify
     classification = bayes.classify(testdata)
 
