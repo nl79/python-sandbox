@@ -106,11 +106,11 @@ def classify(data, labels, means):
             for key in classes:
                 d[key] += (means.get(key)[j] - data[i][j])**2
 
-            # Calculate the max
-            max = 0
+            # Calculate the min
+            min = float("inf")
             c = None
             for key in d:
-                if d[key] > max:
+                if d[key] < min:
                     max = d[key]
                     c = key
 
@@ -139,8 +139,6 @@ def splitData(data, labels):
 
 if __name__ == "__main__":
     #validate parameters
-    print('arvs', sys.argv);
-
     if len(sys.argv) < 3:
         exit()
 

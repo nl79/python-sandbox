@@ -1,6 +1,9 @@
 import sys
 import math
 
+#python3 naive_bayes.py ../data/breast_cancer/breast_cancer.data ../data/breast_cancer/breast_cancer.trainlabels.6
+
+
 class NaiveBayes(object):
 
     def __init__(self, data, labels):
@@ -12,9 +15,6 @@ class NaiveBayes(object):
         self._means = self.means()
         self._deviations = self.deviations()
 
-        print(self._deviations)
-
-
     def aggregateClasses(self):
         labels = self._labels
 
@@ -25,9 +25,7 @@ class NaiveBayes(object):
                 a[l] += 1
             else:
                 a[l] = 1
-
         return a
-
 
     def means(self):
 
@@ -62,7 +60,6 @@ class NaiveBayes(object):
                 means[c][j] /= classes[c]
 
         return means
-
 
     # Calculate the variance matrix for a row.
     def deviations(self):
@@ -106,7 +103,6 @@ class NaiveBayes(object):
 
         return deviations
 
-
     def classify(self, data):
         rows = len(data)
         if rows == 0:
@@ -116,6 +112,8 @@ class NaiveBayes(object):
         classes = self._classes
         deviations = self._deviations
         means = self._means
+
+        results = [];
 
         # Iterate over every row
         for i in range(0, rows, 1):
@@ -132,20 +130,24 @@ class NaiveBayes(object):
                 for j in classes:
                     d[j] += ((data[i][k] - means.get(j)[k]) / deviations.get(j)[k] )**2
 
-            # Calculate the max
-            min = 0
+            # Calculate the min
+            min = float("inf")
             c = None
 
-            print('d', d)
             for key in d:
-                print()
                 if d[key] < min:
                     min = d[key]
                     c = key
 
             print('{} {}'.format(c, i))
 
-        return False
+            # Save the data and its classifier
+            results.append({
+                "data": data[i],
+                "class": c
+            })
+
+        return results
 
 
 
@@ -205,9 +207,8 @@ def splitData(data, labels):
 
 
 if __name__ == "__main__":
-    #validate parameters
-    print('arvs', sys.argv);
 
+    #validate parameters
     if len(sys.argv) < 3:
         exit()
 
