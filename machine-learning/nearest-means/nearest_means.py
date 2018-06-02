@@ -1,4 +1,5 @@
 import sys
+#python3 nearest_means.py ../data/breast_cancer/breast_cancer.data ../data/breast_cancer/breast_cancer.trainlabels.6
 
 #### Read Data
 def readData(filename):
