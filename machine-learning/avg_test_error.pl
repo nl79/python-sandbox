@@ -35,6 +35,7 @@ $sd = 0;
 for(my $i=0; $i<10; $i++){
   $sd += ($err[$i]-$mean)**2;
 }
+
 $sd /= 10;
 $sd = sqrt($sd);
 print "Naive Bayes error = $mean ($sd)\n";

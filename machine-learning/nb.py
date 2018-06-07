@@ -235,7 +235,6 @@ if __name__ == "__main__":
 
     bayes = NaiveBayes(traindata, labels)
 
-    print('testdata', testdata)
     #classify
     classification = bayes.classify(testdata)
 
