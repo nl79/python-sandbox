@@ -17,7 +17,7 @@ class Sobel(object):
             [1, 2, 1]
         ]
 
-        self.data = self.pad(data)
+        self.data = data
         self.Gx = self.matrix()
         self.Gy = self.matrix()
         self.output = self.matrix()
@@ -52,35 +52,47 @@ class Sobel(object):
         Gy = self.Gy
         o = self.output
 
-        for x in range(1, len(d)-2, 1):
-            for y in range(1, len(d[x])-2, 1):
+        for y in range(0, len(d)-2, 1):
+            for x in range(0, len(d[y])-2, 1):
+                Px = 0;
+                Py = 0;
+                #calculate each pixel
+                for i in range(0, len(Kx), 1):
+                    for j in range(0, len(Kx[i]), 1):
+                        print('(Kx[i][j]', Kx[i][j])
+                        print('d[y-1][x-1]', d[y+i][x+j])
+                        print('(Kx[i][j] * d[y-1][x-1])', (Kx[i][j] * d[y+i][x+j]))
+                        Px += (Kx[i][j] * d[y+i][x+j])
+                        print(Px)
+                # Px =(Kx[0][0] * d[y][x])
+                # + (Kx[0][1] * d[y][x+1])
+                # + (Kx[0][2] * d[y][x+2])
+                #
+                # + (Kx[1][0] * d[y+1][x])
+                # + (Kx[1][1] * d[y+1][x+1])
+                # + (Kx[1][2] * d[y+1][x+2])
+                #
+                # + (Kx[2][0] * d[y+2][x])
+                # + (Kx[2][1] * d[y+2][x+1])
+                # + (Kx[2][2] * d[y+2][x+2])
 
-                # calculate each pixel
-                Px =((Kx[0][0] * d[x-1][y-1])
-                + (Kx[0][1] * d[x][y-1])
-                + (Kx[0][2] * d[x+1][y-1]))
-                + ((Kx[1][0] * d[x-1][y])
-                + (Kx[1][1] * d[x][y])
-                + (Kx[1][2] * d[x+1][y]))
-                + ((Kx[2][0] * d[x-1][y+1])
-                + (Kx[2][1] * d[x][y+1])
-                + (Kx[2][2] * d[x+1][y+1]))
+                #print(Px)
 
-                Py =((Ky[0][0] * d[x-1][y-1])
-                + (Ky[0][1] * d[x][y-1])
-                + (Ky[0][2] * d[x+1][y-1]))
-                + ((Ky[1][0] * d[x-1][y])
-                + (Ky[1][1] * d[x][y])
-                + (Ky[1][2] * d[x+1][y]))
-                + ((Ky[2][0] * d[x-1][y+1])
-                + (Ky[2][1] * d[x][y+1])
-                + (Ky[2][2] * d[x+1][y+1]))
-
-                #store each calculated pixel in Gx mapsself.
-                Gx[x][y] = Px
-                Gy[x][y] = Py
-
-                o[x][y] = math.ceil(math.sqrt(Px**2 + Py**2))
+                # Py =((Ky[0][0] * d[y-1][x-1])
+                # + (Ky[1][0] * d[y][x-1])
+                # + (Ky[2][0] * d[y+1][x-1]))
+                # + ((Ky[0][1] * d[y-1][x])
+                # + (Ky[1][1] * d[y][x])
+                # + (Ky[2][1] * d[y+1][x]))
+                # + ((Ky[0][2] * d[y-1][x+1])
+                # + (Ky[1][2] * d[y][x+1])
+                # + (Ky[2][2] * d[y+1][x+1]))
+                #
+                # #store each calculated pixel in Gx mapsself.
+                Gx[y][x] = Px
+                # Gy[y-1][x-1] = Py
+                #
+                # o[x][y] = math.ceil(math.sqrt(Px**2 + Py**2))
 
         self.output = o
 
@@ -93,6 +105,14 @@ class Sobel(object):
     def getResult(self):
         return self.output
 
+
+def pretty(data):
+    r = '';
+    for row in range(0, len(data)-1, 1):
+        for col in range(0, len(data[row])-1, 1):
+            r += str(data[row][col]) + ','
+        print(r)
+        r = '';
 
 if __name__ == "__main__":
     matrix = [
@@ -111,7 +131,6 @@ if __name__ == "__main__":
     sobel = Sobel(matrix);
 
     #print(sobel.pad(matrix))
-
-    print(sobel.getGx())
-    print(sobel.getGy())
-    print(sobel.getResult())
+    pretty(sobel.getGx())
+    pretty(sobel.getGy())
+    pretty(sobel.getResult())
