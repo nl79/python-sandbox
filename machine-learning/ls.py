@@ -14,19 +14,20 @@ class LeastSquares(object):
     def process(self):
         return self.descent(self._data, self._labels)
 
+
     def cost(self, w, data, label):
         error = 0
         for i in data:
             error += (self.dot(w, data[i]) - labels.get(i)) ** 2
         return error
 
-    def descent(self, data, labels, eta = .001, stop = 0.001, max=20000):
+    def descent(self, data, labels, eta = .001, stop = 0.001, max=2000):
         val = 1.0/len(data.get(0))
         count = 0
 
         w = [val for i in range(0, len(data[0]))]
 
-        j = self.cost(w, data, labels)
+        J = self.cost(w, data, labels)
 
         converged = False
 
@@ -47,21 +48,29 @@ class LeastSquares(object):
             for i in range(0, len(data[0]), 1):
                 w[i] = w[i] - eta * dellf[i]
 
-            #compute error
             error = self.cost(w, data, labels)
 
             #compare new error to previous iretaion
-            if( abs(j - error) <= stop):
+            #print("error: {}".format(error))
+            if( abs(J - error) <= stop):
                 converged = True
 
-            j = error
+            J = error
 
             count += 1
             if(count == max):
+                print('Braeking Out')
                 converged = True
+        return w
 
-        return w[:2]
 
+    def distance(self, w):
+        n = 0
+        for i in range(0, (len(w) -1), 1):
+            n += w[i] ** 2
+        n = math.sqrt(n)
+
+        return abs(w[len(w) - 1] / n)
 
     def dot(self, m1, m2):
         res = 0
@@ -69,18 +78,6 @@ class LeastSquares(object):
             res += m1[i] * m2[i]
 
         return res
-
-    def distance(self, w):
-        normw = 0
-        for i in range(0, len(w), 1):
-            normw += w[i] ** 2
-
-        normw = math.sqrt(normw)
-
-        # distance to d_origin
-        d_origin = abs(w[len(w) - 1] / normw)
-
-        return d_origin
 
     def classify(self, data):
         w = self._w;
@@ -186,13 +183,10 @@ if __name__ == "__main__":
 
 
     ls = LeastSquares(traindata, labels)
-
     w = ls.process()
     distance = ls.distance(w)
-    print(w)
-    print("Distance to origin: " + str(distance))
-
-
+    print(w[:-1])
+    print ("Distance to origin = " + str(distance))
     #classify
     #classification = ls.classify(testdata)
 
