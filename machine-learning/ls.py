@@ -152,8 +152,6 @@ def splitData(data, labels):
 
 
 if __name__ == "__main__":
-
-    print('here')
     #validate parameters
     if len(sys.argv) < 3:
         exit()
