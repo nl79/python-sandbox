@@ -1,9 +1,7 @@
 import sys
 import math
 import random
-
-#python3 ls.py ./breast_cancer/breast_cancer.data ./breast_cancer/breast_cancer.trainlabels.6
-#python3 ls.py ./breast_cancer/breast_cancer.data ./breast_cancer/breast_cancer.trainlabels.6
+#python3 perceptron.py ./breast_cancer/breast_cancer.data ./breast_cancer/breast_cancer.trainlabels.6
 
 class LeastSquares(object):
 
@@ -185,8 +183,8 @@ if __name__ == "__main__":
     ls = LeastSquares(traindata, labels)
     w = ls.process(eta)
     distance = ls.distance(w)
-    print(w[:-1])
-    print ("Distance to origin = " + str(distance))
+    # print(w[:-1])
+    # print ("Distance to origin = " + str(distance))
     #classify
     classification = ls.classify(testdata, w)
 
