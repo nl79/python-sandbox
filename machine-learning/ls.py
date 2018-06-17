@@ -21,7 +21,7 @@ class LeastSquares(object):
             error += (self.dot(w, data[i]) - labels.get(i)) ** 2
         return error
 
-    def descent(self, data, labels, eta = .001, stop = 0.001, max=2000):
+    def descent(self, data, labels, eta = .000000001, stop = 0.001, max=2000):
 
         cols = len(data.get(list(data.keys())[0]))
         val = 1.0/cols
@@ -61,7 +61,6 @@ class LeastSquares(object):
 
             count += 1
             if(count == max):
-                print('Braeking Out')
                 converged = True
         return w
 
@@ -81,8 +80,7 @@ class LeastSquares(object):
 
         return res
 
-    def classify(self, data):
-        w = self._w;
+    def classify(self, data, w):
         labels = {};
 
         for i in data:
@@ -188,7 +186,7 @@ if __name__ == "__main__":
     print(w[:-1])
     print ("Distance to origin = " + str(distance))
     #classify
-    #classification = ls.classify(testdata)
+    classification = ls.classify(testdata, w)
 
     # Classify
     #classes = classify(testdata, labels, means)
