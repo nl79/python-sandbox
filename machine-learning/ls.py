@@ -11,9 +11,8 @@ class LeastSquares(object):
         self._data = data
         self._labels = labels
 
-    def process(self):
-        return self.descent(self._data, self._labels)
-
+    def process(self, eta=.0001):
+        return self.descent(self._data, self._labels, eta)
 
     def cost(self, w, data, label):
         error = 0
@@ -21,7 +20,7 @@ class LeastSquares(object):
             error += (self.dot(w, data[i]) - labels.get(i)) ** 2
         return error
 
-    def descent(self, data, labels, eta = .000000001, stop = 0.001, max=2000):
+    def descent(self, data, labels, eta = .0001, stop = 0.001, max=2000):
 
         cols = len(data.get(list(data.keys())[0]))
         val = 1.0/cols
@@ -162,6 +161,9 @@ if __name__ == "__main__":
     traindata = []
     testdata = []
 
+    # Change ETA here
+    eta = .0001
+
     #read datafile
     data = readData(datafile)
 
@@ -181,7 +183,7 @@ if __name__ == "__main__":
 
 
     ls = LeastSquares(traindata, labels)
-    w = ls.process()
+    w = ls.process(eta)
     distance = ls.distance(w)
     print(w[:-1])
     print ("Distance to origin = " + str(distance))
