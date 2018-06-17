@@ -22,17 +22,19 @@ class LeastSquares(object):
         return error
 
     def descent(self, data, labels, eta = .001, stop = 0.001, max=2000):
-        val = 1.0/len(data.get(0))
+
+        cols = len(data.get(list(data.keys())[0]))
+        val = 1.0/cols
         count = 0
 
-        w = [val for i in range(0, len(data[0]))]
+        w = [val for i in range(0, cols)]
 
         J = self.cost(w, data, labels)
 
         converged = False
 
         while not converged:
-            dellf = [0 for i in range(0, len(data[0]))]
+            dellf = [0 for i in range(0, cols)]
 
             # compute dellf
             for i in data:
@@ -45,7 +47,7 @@ class LeastSquares(object):
                     dellf[j] += (dp - labels.get(i)) * data[i][j]
 
             #update w
-            for i in range(0, len(data[0]), 1):
+            for i in range(0, cols, 1):
                 w[i] = w[i] - eta * dellf[i]
 
             error = self.cost(w, data, labels)
