@@ -13,7 +13,7 @@ class LogisticRegression(object):
     def process(self, eta=.0001):
         return self.descent(self._data, self._labels, eta)
 
-    def cost(self, w, data, label):
+    def sig(self, w, data, label):
         c = 0
         for i in data:
             c += label.get(i) - (self.sigmoid(w, data[i]))
@@ -50,7 +50,7 @@ class LogisticRegression(object):
                 # calculate the dot product.
                 dp = self.dot(w, data[i])
 
-                # coefi 
+                # coefi
 
 
                 for j in range(0, len(data[i]), 1):
