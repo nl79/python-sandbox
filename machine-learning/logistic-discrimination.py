@@ -13,12 +13,8 @@ class LogisticRegression(object):
     def process(self, eta=.0001):
         return self.descent(self._data, self._labels, eta)
 
-    def sig(self, w, data, label):
-        c = 0
-        for i in data:
-            c += label.get(i) - (self.sigmoid(w, data[i]))
-
-        return c
+    def gradient(self, w, data, label):
+        return (label - (self.sigmoid(w, data)))
 
 
     def sigmoid(self, w, x):
@@ -26,11 +22,26 @@ class LogisticRegression(object):
 
         return p
 
+    def loss(self, w, data, label):
+        loss = 0
+        for i in data:
+            #print("w: {}".format(w))
+            exp = (-1 * label.get(i) * self.dot(w, data[i]))
+            step = 1 + math.exp(exp)
+
+            print("Step: {}".format(step))
+
+            loss += math.log(step)
+            #print("Loss: {}".format(loss))
+
+        print("--Loss: {}".format(loss))
+        return loss
+
     def norm(d):
         s = sum(d)
         return [float(w/s) for w in ws]
 
-    def descent(self, data, labels, eta = .001, stop = .000000001, max=float("inf")):
+    def descent(self, data, labels, eta = .001, stop = .0000001, max=float("inf")):
 
         cols = len(data.get(list(data.keys())[0]))
         count = 0
@@ -47,15 +58,14 @@ class LogisticRegression(object):
             # compute dellf
             for i in data:
 
-                # calculate the dot product.
-                dp = self.dot(w, data[i])
 
-                # coefi
+                # coeficient
+                coef = self.gradient(w, data[i], labels.get(i))
 
-
+                #print("coef: {} ".format(coef))
                 for j in range(0, len(data[i]), 1):
-
-                    dellf[j] += self.cost(w, data[i])
+                    dellf[j] += coef * data[i][j]
+                    #print("dellf[f]: {}".format(dellf[j]))
 
 
             #update w
@@ -66,7 +76,7 @@ class LogisticRegression(object):
             loss = self.loss(w, data, labels)
 
             #compare new error to previous iretaion
-            print("loss: {}".format(loss))
+            #print("loss: {}".format(loss))
             if( abs(J - loss) <= stop):
                 converged = True
 
@@ -177,7 +187,7 @@ if __name__ == "__main__":
     testdata = []
 
     # Change ETA here
-    eta = .001
+    eta = .0000001
 
     #read datafile
     data = readData(datafile)
@@ -197,13 +207,13 @@ if __name__ == "__main__":
         traindata = data.get("training")
 
 
-    ls = HingeLoss(traindata, labels)
-    w = ls.process(eta)
-    distance = ls.distance(w)
+    lr = LogisticRegression(traindata, labels)
+    w = lr.process(eta)
+    distance = lr.distance(w)
     print(w[:-1])
     print ("Distance to origin = " + str(distance))
     #classify
-    classification = ls.classify(testdata, w)
+    classification = lr.classify(testdata, w)
 
     # Classify
     #classes = classify(testdata, labels, means)
