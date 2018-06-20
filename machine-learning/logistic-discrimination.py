@@ -2,39 +2,29 @@ import sys
 import math
 import random
 
-#python3 hinge-loss.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
-
+#python3 logistic-discrimination.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
+#python3 logistic-discrimination.py sample-data.txt sample-labels.txt
 class LogisticRegression(object):
 
     def __init__(self, data, labels):
         self._data = data
         self._labels = labels
 
-    def process(self, eta=.0001):
-        return self.descent(self._data, self._labels, eta)
+    def process(self, eta=.0001, stop=.001):
+        return self.descent(self._data, self._labels, eta, stop)
 
     def gradient(self, w, data, label):
         return (label - (self.sigmoid(w, data)))
 
 
     def sigmoid(self, w, x):
-        p = 1 / (1+math.exp(-(self.dot(w,x))))
-
-        return p
+        return 1 / ( 1 + (math.exp(-1 * self.dot(w,x))))
 
     def loss(self, w, data, label):
         loss = 0
         for i in data:
-            #print("w: {}".format(w))
-            exp = (-1 * label.get(i) * self.dot(w, data[i]))
-            step = 1 + math.exp(exp)
+            loss += math.log(1 + math.exp((-1 * label.get(i) * self.dot(w, data[i]))))
 
-            print("Step: {}".format(step))
-
-            loss += math.log(step)
-            #print("Loss: {}".format(loss))
-
-        print("--Loss: {}".format(loss))
         return loss
 
     def norm(d):
@@ -67,35 +57,36 @@ class LogisticRegression(object):
                     dellf[j] += coef * data[i][j]
                     #print("dellf[f]: {}".format(dellf[j]))
 
-
             #update w
             for i in range(0, cols, 1):
-                w[i] = w[i] - eta * dellf[i]
+                w[i] = w[i] + eta * dellf[i]
 
             #compute loss
             loss = self.loss(w, data, labels)
 
             #compare new error to previous iretaion
-            #print("loss: {}".format(loss))
+            # print("loss: {}".format(loss))
+            # print("abs(J - loss): {}".format(abs(J - loss)))
+
             if( abs(J - loss) <= stop):
                 converged = True
 
             J = loss
 
             count += 1
-            print(count)
             if(count == max):
                 converged = True
         return w
 
 
     def distance(self, w):
+        return w[len(w) - 1] / self.normw(w)
+
+    def normw(self, w):
         n = 0
         for i in range(0, (len(w) -1), 1):
             n += w[i] ** 2
-        n = math.sqrt(n)
-
-        return abs(w[len(w) - 1] / n)
+        return math.sqrt(n)
 
     def dot(self, m1, m2):
         res = 0
@@ -146,7 +137,7 @@ def readLabels(filename):
     while(line != ''):
         a = line.split()
 
-        labels[int(a[1])] = -1 if int(a[0]) == 0 else int(a[0])
+        labels[int(a[1])] = 0 if int(a[0]) == 0 else int(a[0])
         line = file.readline()
 
     file.close()
@@ -187,7 +178,8 @@ if __name__ == "__main__":
     testdata = []
 
     # Change ETA here
-    eta = .0000001
+    eta = .01
+    stop = .000000001
 
     #read datafile
     data = readData(datafile)
@@ -208,9 +200,10 @@ if __name__ == "__main__":
 
 
     lr = LogisticRegression(traindata, labels)
-    w = lr.process(eta)
+    w = lr.process(eta, stop)
     distance = lr.distance(w)
     print(w[:-1])
+    print("||w|| :{}".format(lr.normw(w)))
     print ("Distance to origin = " + str(distance))
     #classify
     classification = lr.classify(testdata, w)
