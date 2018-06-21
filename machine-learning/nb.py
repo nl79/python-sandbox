@@ -10,7 +10,7 @@ class NaiveBayes(object):
         self._data = data
         self._labels = labels
         self._rows = len(data)
-        self._cols = len(data[0])
+        self._cols = len(data.get(list(data.keys())[0]))
         self._classes = self.aggregateClasses()
         self._means = self.means()
         self._deviations = self.deviations()
@@ -38,10 +38,9 @@ class NaiveBayes(object):
         # build the means dict and initialize the class list of attribute vaues to 0
         means = {}
         for key in classes:
-            means.setdefault(str(key), [1]*self._cols)
+            means.setdefault(str(key), [0]*self._cols)
 
-        for i in range(0, rows, 1):
-
+        for i in data:
             # get the row class value
             c = labels.get(i)
 
@@ -54,11 +53,14 @@ class NaiveBayes(object):
             for j in range(0, self._cols, 1):
                 current[j] += data[i][j]
 
+            current[j] += data[i][j]
+
         # Calculate the means.
         for j in range(0, self._cols, 1):
             for c in classes:
                 means[c][j] /= classes[c]
 
+        print(means)
         return means
 
     # Calculate the variance matrix for a row.
@@ -190,7 +192,7 @@ def readLabels(filename):
 # unclassified (test data)
 def splitData(data, labels):
 
-    training = []
+    training = {}
     test = {}
 
     for i in range(0, len(data), 1):
@@ -198,7 +200,7 @@ def splitData(data, labels):
         if(labels.get(i) == None):
             test.setdefault(i, data[i])
         else:
-            training.append(data[i])
+            training.setdefault(i, data[i])
 
     return {"training": training, "test": test}
 
@@ -231,7 +233,6 @@ if __name__ == "__main__":
         data = splitData(data, labels)
         testdata = data.get("test")
         traindata = data.get("training")
-
 
     bayes = NaiveBayes(traindata, labels)
 
