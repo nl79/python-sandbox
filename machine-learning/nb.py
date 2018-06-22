@@ -60,7 +60,6 @@ class NaiveBayes(object):
             for c in classes:
                 means[c][j] /= classes[c]
 
-        print(means)
         return means
 
     # Calculate the variance matrix for a row.
@@ -74,7 +73,7 @@ class NaiveBayes(object):
         # Initialize the deviations collection.
         deviations = {}
         for key in classes:
-            deviations.setdefault(str(key), [1]*self._cols)
+            deviations.setdefault(str(key), [0]*self._cols)
 
         for i in range(0, rows, 1):
 
@@ -127,7 +126,9 @@ class NaiveBayes(object):
             for k in range(0, len(row), 1):
 
                 for j in classes:
-                    d[j] += ((row[k] - means.get(j)[k]) / deviations.get(j)[k] )**2
+                    sd = deviations.get(j)[k]
+                    sd = deviations.get(j)[k] if deviations.get(j)[k] != 0 else 1
+                    d[j] += ((row[k] - means.get(j)[k]) / sd )**2
 
             # Calculate the min
             min = float("inf")
