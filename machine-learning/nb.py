@@ -74,7 +74,7 @@ class NaiveBayes(object):
         # Initialize the deviations collection.
         deviations = {}
         for key in classes:
-            deviations.setdefault(str(key), [0]*self._cols)
+            deviations.setdefault(str(key), [1]*self._cols)
 
         for i in range(0, rows, 1):
 
