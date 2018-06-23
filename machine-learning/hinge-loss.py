@@ -65,6 +65,8 @@ class HingeLoss(object):
 
             #compare new error to previous iretaion
             #print("loss: {}".format(loss))
+            #print('abs(J - loss)' + str(abs(J - loss)))
+            
             if( abs(J - loss) <= stop):
                 converged = True
 
@@ -95,7 +97,9 @@ class HingeLoss(object):
     def classify(self, data, w):
         labels = {};
 
-        for i in data:
+        key = sorted(data.keys())
+
+        for i in key:
             dp = self.dot(w, data[i])
             c = "1" if dp > 0 else "0"
             labels[i] = c
@@ -181,7 +185,7 @@ if __name__ == "__main__":
     stop = .000000001
 
     # Max iterations
-    maximum = 2000
+    maximum = 3000
 
     #read datafile
     data = readData(datafile)
