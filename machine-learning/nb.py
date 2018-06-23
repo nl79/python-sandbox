@@ -109,10 +109,12 @@ class NaiveBayes(object):
         deviations = self._deviations
         means = self._means
 
-        results = [];
+        results = []
 
         # Iterate over every row
-        for i in data:
+        keys = data.keys()
+       
+        for i in keys:
 
             row = data[i]
 
