@@ -113,7 +113,7 @@ class NaiveBayes(object):
 
         # Iterate over every row
         keys = data.keys()
-       
+        keys = sorted(keys)
         for i in keys:
 
             row = data[i]
