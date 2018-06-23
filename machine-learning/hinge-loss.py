@@ -10,8 +10,8 @@ class HingeLoss(object):
         self._data = data
         self._labels = labels
 
-    def process(self, eta=.0001):
-        return self.descent(self._data, self._labels, eta)
+    def process(self, eta=.0001, stop = .000000001, max=float("inf")):
+        return self.descent(self._data, self._labels, eta, stop, max)
 
     def cost(self, w, data, label):
         error = 0
@@ -64,14 +64,14 @@ class HingeLoss(object):
             loss = self.loss(w, data, labels)
 
             #compare new error to previous iretaion
-            print("loss: {}".format(loss))
+            #print("loss: {}".format(loss))
             if( abs(J - loss) <= stop):
                 converged = True
 
             J = loss
 
             count += 1
-            print(count)
+            #print(count)
             if(count == max):
                 converged = True
         return w
@@ -175,7 +175,13 @@ if __name__ == "__main__":
     testdata = []
 
     # Change ETA here
-    eta = .001
+    eta = .0001
+
+    # Stop condition
+    stop = .000000001
+
+    # Max iterations
+    maximum = 2000
 
     #read datafile
     data = readData(datafile)
@@ -196,10 +202,10 @@ if __name__ == "__main__":
 
 
     ls = HingeLoss(traindata, labels)
-    w = ls.process(eta)
+    w = ls.process(eta, stop, maximum)
     distance = ls.distance(w)
-    print(w[:-1])
-    print ("Distance to origin = " + str(distance))
+    # print(w[:-1])
+    # print ("Distance to origin = " + str(distance))
     #classify
     classification = ls.classify(testdata, w)
 

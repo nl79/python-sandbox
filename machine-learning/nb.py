@@ -127,8 +127,7 @@ class NaiveBayes(object):
 
                 for j in classes:
                     sd = deviations.get(j)[k]
-                    sd = deviations.get(j)[k] if deviations.get(j)[k] != 0 else 1
-                    d[j] += ((row[k] - means.get(j)[k]) / sd )**2
+                    d[j] += (((row[k] - means.get(j)[k]) / sd )**2) if sd != 0 else 0
 
             # Calculate the min
             min = float("inf")
