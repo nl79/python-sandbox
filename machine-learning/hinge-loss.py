@@ -182,7 +182,7 @@ if __name__ == "__main__":
     eta = .0001
 
     # Stop condition
-    stop = .000000001
+    stop = .001
 
     # Max iterations
     maximum = 3000
