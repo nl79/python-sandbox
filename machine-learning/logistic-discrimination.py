@@ -27,10 +27,6 @@ class LogisticRegression(object):
 
         return loss
 
-    def norm(d):
-        s = sum(d)
-        return [float(w/s) for w in ws]
-
     def descent(self, data, labels, eta = .001, stop = .0000001, max=float("inf")):
 
         cols = len(data.get(list(data.keys())[0]))
@@ -67,7 +63,6 @@ class LogisticRegression(object):
             #compare new error to previous iretaion
             # print("loss: {}".format(loss))
             # print("abs(J - loss): {}".format(abs(J - loss)))
-
             if( abs(J - loss) <= stop):
                 converged = True
 
@@ -179,7 +174,7 @@ if __name__ == "__main__":
 
     # Change ETA here
     eta = .01
-    stop = .000000001
+    stop = .001
 
     #read datafile
     data = readData(datafile)
