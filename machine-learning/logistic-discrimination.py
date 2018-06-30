@@ -93,7 +93,9 @@ class LogisticRegression(object):
     def classify(self, data, w):
         labels = {};
 
-        for i in data:
+        key = sorted(data.keys())
+        
+        for i in key:
             dp = self.dot(w, data[i])
             c = "1" if dp > 0 else "0"
             labels[i] = c
