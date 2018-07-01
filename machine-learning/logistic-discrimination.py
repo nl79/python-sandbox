@@ -59,7 +59,8 @@ class LogisticRegression(object):
 
             #compute loss
             loss = self.loss(w, data, labels)
-
+            
+            print("Loss: {}".format(loss))
             #compare new error to previous iretaion
             # print("loss: {}".format(loss))
             # print("abs(J - loss): {}".format(abs(J - loss)))
@@ -175,7 +176,7 @@ if __name__ == "__main__":
     testdata = []
 
     # Change ETA here
-    eta = .01
+    eta = .001
     stop = .001
 
     #read datafile
