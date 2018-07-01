@@ -60,7 +60,6 @@ class LogisticRegression(object):
             #compute loss
             loss = self.loss(w, data, labels)
             
-            print("Loss: {}".format(loss))
             #compare new error to previous iretaion
             # print("loss: {}".format(loss))
             # print("abs(J - loss): {}".format(abs(J - loss)))
