@@ -10,24 +10,47 @@ class DecisionTree(object):
         self._data = data
         self._labels = labels
 
-    def gini(self, w, data, label):
-        val = 0
-        return val
+    def gini(self,cols, split, rows):
 
-    def getCounts(self, data):
-      counts = {
-        "p": 0,
-        "n": 0
-      }
+        #left split size
+        lsize = split
 
-      for key in data:
-        l = label.get(key)
-        if(l == 1):
-          counts["p"] += 1
-        else:
-          counts["n"] += 1
+        #right split size
+        rsize = len(cols) - lsize
 
-      return counts
+        #left proportion
+        lp = 0
+
+        #right proportion
+        rp = 0
+
+        for i in range(0, split):
+            if(cols[i][1] == 0):
+                lp += 1
+
+        for j in range(split, len(cols)):
+            if(cols[j][1] == 0):
+                rp += 1
+        
+        #gini = (lsize/rows)*(lp/lsize)*(1 - lp/lsize) + (rsize/rows)*(rp/rsize)*(1 - rp/rsize);
+
+        # where lsize is the size of the left partition, lp is the 
+        # proportion of -1 labels in the left partition, rsize is the 
+        # size of the right partition, rp is the proportion of -1 
+        # labels in the right partition, and rows is the total number of
+        # datapoints in the dataset d (passed to the function)
+        
+        gini = (lsize/rows)*(lp/lsize)*(1 - lp/lsize) + (rsize/rows)*(rp/rsize)*(1 - rp/rsize);
+        #print("({}/{})*({}/{})*(1 - {}/{}) + ({}/{})*({}/{})*(1 - {}/{})".format(lsize, rows, lp, lsize,lp,lsize,rsize,rows,rp,rsize,rp,rsize))
+        return gini
+
+    def threshold(self, data, split):
+      
+      # Valiate the split is not at the beginning or end of the data array.
+      a = data[split-1][0]
+      b = data[split][0]
+
+      return (a + b) / 2
 
     def extractColumnData(self, i, data, label):
       col = []
@@ -41,29 +64,32 @@ class DecisionTree(object):
       return self.run(self._data, self._labels)
 
     def run(self, data, label):
-      ginivals = []
+
+      min = float("inf")
       split = 0
+      feature = 0
+
+      temp = None
+
       rows = len(data)
       cols = len(data.get(list(data.keys())[0]))
-
-      for j in range(0, cols, 1):
-        ginivals.append([0, 0])
       
       for j in range(0, cols, 1):
-        col = self.extractColumnData(j, data, label)
+        cData = self.extractColumnData(j, data, label)
 
-        for i in range(1, len(col)-1):
-            for j in range(0, i):
-                #left split
+        # split the data and get the Gini score
+        for i in range(1, len(cData)):
+            score = self.gini(cData, i, rows)
             
-            for k in range(i, len(col)):
-                #right split
-
-            
-        
-
+            if( score < min ):
+                min = score
+                feature = j
+                split = i
+                temp = cData
       
-      return 0
+      threshold = self.threshold(temp, split)
+
+      return {"k": feature, "s": threshold}
 
 
 #### Read Data
@@ -151,8 +177,8 @@ if __name__ == "__main__":
         testdata = data.get("test")
         traindata = data.get("training")
 
-
     dt = DecisionTree(traindata, labels)
 
-    dt.process()
+    result = dt.process()
+    print(result)
 
