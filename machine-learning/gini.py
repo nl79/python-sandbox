@@ -91,6 +91,17 @@ class DecisionTree(object):
 
       return {"k": feature, "s": threshold}
 
+    def classify(self, data, params):
+        k = params['k']
+        s = params['s']
+
+        key = sorted(data.keys())
+        for i in key:
+            row = data[i]
+            val = row[k]
+
+            c = "1" if val < s else "0"
+            print("{} {}".format(c, str(i)))
 
 #### Read Data
 def readData(filename):
@@ -179,6 +190,7 @@ if __name__ == "__main__":
 
     dt = DecisionTree(traindata, labels)
 
-    result = dt.process()
-    print(result)
+    params = dt.process()
+    print(params)
+    classification = dt.classify(testdata, params)
 
