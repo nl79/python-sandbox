@@ -4,8 +4,7 @@ import random
 from sklearn.svm import LinearSVC
 
 # python3 dimensionality-reduction.py data/SNP/testdata data/SNP/truelabels.txt data/SNP/traindata
-# python3 dimensionality-reduction.py data/SNP/testdata data/SNP/truelabels.txt data/SNP/traindata
-
+# python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
 
 class ChiSVM(object):
 
@@ -15,8 +14,6 @@ class ChiSVM(object):
 
     def chiSqr(self, X, y, k):
         cols = len(X[0])
-
-        T = []
 
         F = {}
 
@@ -79,15 +76,11 @@ class ChiSVM(object):
           for x in zip(*sqr):
             sqrSum.append(sum(x))
 
-          #T.append(sum(sqrSum))
-          F.setdefault(j, sqrSum)
+          F.setdefault(j, sum(sqrSum))
+                
+        fields = sorted(F, key=F.__getitem__, reverse=True)
         
-        #fields = sorted(range(len(T)), key=F.__getitem__, reverse=True)
-        fields = sorted(F.iteritems(), key=lambda (k,v): (v,k))
-
-        print(fields)
-        return fields
-        #return fields[:k]
+        return fields[:k]
 
 
 # Read Data
