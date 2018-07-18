@@ -3,7 +3,7 @@ import math
 import random
 
 # python3 bagged-gini.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
-
+# perl test_error.pl bagged-gini ionosphere
 
 class Bag(object):
 
@@ -11,7 +11,7 @@ class Bag(object):
         self._data = data
         self._labels = labels
 
-    def createBag(self):
+    def shuffle(self):
         n = len(self._data)
 
         data = {}
@@ -27,10 +27,38 @@ class Bag(object):
             data.setdefault(i, self._data.get(key))
             labels.setdefault(i, self._labels.get(key))
 
-            #for debugging Original Keys
+            # for debugging Original Keys
             oKeys.append(key)
 
         return {'X': data, 'y': labels, 'keys': oKeys}
+
+    def aggregate(self, data):
+      result = []
+      if(len(data) == 1):
+        return result
+
+      totals = {}
+
+      for i in range(0, len(data)):
+        for key in data[i]:
+          val = int(data[i][key])
+          if(key in totals):
+            totals[key].append(val)
+          else:
+            totals.setdefault(key,[val])
+      
+      for key in totals:
+        total = sum(totals[key])
+        c = ''
+        if(total >= math.floor(len(totals[key])/2)):
+          c = 1
+        else:
+          c = 0
+      
+        print("{} {}".format(str(c), str(key)))
+        result.append((key, c))
+
+      return result
 
 
 class DecisionTree(object):
@@ -138,6 +166,8 @@ class DecisionTree(object):
         return o
 
 # Read Data
+
+
 def readData(filename):
     file = open(filename)
     data = []
@@ -200,7 +230,7 @@ if __name__ == "__main__":
         exit()
 
     # Number of bags to create
-    bags = 10
+    bags = 20
 
     datafile = sys.argv[1]
     labelfile = sys.argv[2]
@@ -232,9 +262,9 @@ if __name__ == "__main__":
     for i in range(0, bags):
 
         # Crete a random data set with labels.
-        model = bag.createBag()
+        model = bag.shuffle()
 
-        #print(sorted(model['keys']))
+        # print(sorted(model['keys']))
 
         # process the model and store the labels.
         dt = DecisionTree(model['X'], model['y'])
@@ -246,4 +276,4 @@ if __name__ == "__main__":
         # print("Feature: {} | Split: {}".format(params["k"], params["s"]))
 
 # Pick the most common labels out of all of the models.
-print(results)
+classification = bag.aggregate(results)
