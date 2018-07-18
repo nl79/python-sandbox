@@ -10,25 +10,30 @@ class LogisticRegression(object):
         self._data = data
         self._labels = labels
 
-    def process(self, eta=.0001, stop=.001):
-        return self.descent(self._data, self._labels, eta, stop)
+    def process(self, eta=.01, stop=.001, max=float("inf")):
+        return self.descent(self._data, self._labels, eta, stop, max)
 
     def gradient(self, w, data, label):
-        return (label - (self.sigmoid(w, data)))
+        return (self.sigmoid(w, data) - label)
 
 
     def sigmoid(self, w, x):
-        return 1 / ( 1 + (math.exp(-1 * self.dot(w,x))))
+        return 1.0 / ( 1 + math.exp(-self.dot(w,x)))
+
 
     def loss(self, w, data, label):
         loss = 0
         for i in data:
             loss += math.log(1 + math.exp((-1 * label.get(i) * self.dot(w, data[i]))))
+            #loss += (label.get(i) -  math.log(1 + math.exp(-1 * self.dot(w, data[i]))))**2
 
         return loss
 
-    def descent(self, data, labels, eta = .001, stop = .0000001, max=float("inf")):
+    def norm(self, w):
+        total = sum(w)
+        return [float(i/total) for i in w]
 
+    def descent(self, data, labels, eta = .01, stop = .0000001, max=float("inf")):
         cols = len(data.get(list(data.keys())[0]))
         count = 0
 
@@ -44,10 +49,9 @@ class LogisticRegression(object):
             # compute dellf
             for i in data:
 
-
                 # coeficient
                 coef = self.gradient(w, data[i], labels.get(i))
-
+                
                 #print("coef: {} ".format(coef))
                 for j in range(0, len(data[i]), 1):
                     dellf[j] += coef * data[i][j]
@@ -55,20 +59,22 @@ class LogisticRegression(object):
 
             #update w
             for i in range(0, cols, 1):
-                w[i] = w[i] + eta * dellf[i]
+                w[i] = w[i] - (eta * dellf[i])
 
             #compute loss
             loss = self.loss(w, data, labels)
             
             #compare new error to previous iretaion
-            # print("loss: {}".format(loss))
-            # print("abs(J - loss): {}".format(abs(J - loss)))
+            #print("loss: {}".format(loss))
+            #print("abs(J - loss): {}".format(abs(J - loss)))
             if( abs(J - loss) <= stop):
                 converged = True
 
             J = loss
 
             count += 1
+            #print("count: {} | max: {}".format(count, max))
+        
             if(count == max):
                 converged = True
         return w
@@ -94,7 +100,6 @@ class LogisticRegression(object):
         labels = {};
 
         key = sorted(data.keys())
-        
         for i in key:
             dp = self.dot(w, data[i])
             c = "1" if dp > 0 else "0"
@@ -176,7 +181,8 @@ if __name__ == "__main__":
 
     # Change ETA here
     eta = .001
-    stop = .001
+    stop = .0001
+    max = 10000
 
     #read datafile
     data = readData(datafile)
@@ -197,7 +203,7 @@ if __name__ == "__main__":
 
 
     lr = LogisticRegression(traindata, labels)
-    w = lr.process(eta, stop)
+    w = lr.process(eta, stop, max)
     distance = lr.distance(w)
     print(w[:-1])
     print("||w|| :{}".format(lr.normw(w)))
