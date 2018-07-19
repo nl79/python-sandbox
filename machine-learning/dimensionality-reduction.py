@@ -3,6 +3,10 @@ import math
 import random
 from sklearn.svm import LinearSVC
 
+
+from sklearn.datasets import make_classification
+
+
 # python3 dimensionality-reduction.py data/SNP/testdata data/SNP/truelabels.txt data/SNP/traindata
 # python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
 
@@ -11,6 +15,21 @@ class ChiSVM(object):
     def __init__(self, data, labels):
         self._data = data
         self._labels = labels
+
+
+    # Generate a new DAta Set using only the features in the list
+    def reduce(self, data, features, labels={}):
+        X = []
+        y = []
+        for  i in data:
+            row = []
+            for f in features:
+                row.append(data[i][f])
+            X.append(row)
+            y.append(labels.get(i))
+
+        return X, y
+
 
     def chiSqr(self, X, y, k):
         cols = len(X[0])
@@ -104,15 +123,23 @@ def readData(filename):
 
 
 # Read Label
-def readLabels(filename):
+def readLabels(filename, flat=False):
 
     file = open(labelfile)
 
-    labels = {}
+
+    labels = {} if flat == False else []
+
     line = file.readline()
+
     while(line != ''):
         a = line.split()
-        labels[int(a[1])] = int(a[0])
+
+        if( flat == False):
+            labels[int(a[1])] = int(a[0])
+        else:
+            labels.append(int(a[0]))
+
         line = file.readline()
 
     file.close()
@@ -169,6 +196,28 @@ if __name__ == "__main__":
 
     csvm = ChiSVM(traindata, labels)
 
-    params = csvm.chiSqr(traindata, labels, 15)
-    print(params)
+    features = csvm.chiSqr(traindata, labels, 15)
+   
+    X, y = csvm.reduce(traindata, features, labels)
+  
+    clf = LinearSVC(random_state=0)
+    clf.fit(X, y)
+    print(clf.coef_)
+    print(clf.intercept_)
+
+    print(testdata)
+
+    tX, y = csvm.reduce(testdata, features)
+
+    print(tX)
+
+    print(clf.predict(tX))
+
+
+    # X, y = make_classification(n_features=4, random_state=0)
+    # print(X)
+    # print(y)
+
+
+   
     #classification = dt.classify(testdata, params)
