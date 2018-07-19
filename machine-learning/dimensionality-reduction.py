@@ -3,10 +3,6 @@ import math
 import random
 from sklearn.svm import LinearSVC
 
-
-from sklearn.datasets import make_classification
-
-
 # python3 dimensionality-reduction.py data/SNP/testdata data/SNP/truelabels.txt data/SNP/traindata
 # python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
 
@@ -212,12 +208,5 @@ if __name__ == "__main__":
     print(tX)
 
     print(clf.predict(tX))
-
-
-    # X, y = make_classification(n_features=4, random_state=0)
-    # print(X)
-    # print(y)
-
-
-   
+  
     #classification = dt.classify(testdata, params)
