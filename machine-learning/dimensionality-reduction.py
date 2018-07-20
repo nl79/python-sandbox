@@ -3,7 +3,7 @@ import math
 import random
 from sklearn.svm import LinearSVC
 
-# python3 dimensionality-reduction.py data/SNP/testdata data/SNP/truelabels.txt data/SNP/traindata
+# python3 dimensionality-reduction.py data/SNP/traindata data/SNP/truelabels.txt data/SNP/testdata
 # python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
 
 class ChiSVM(object):
@@ -14,17 +14,15 @@ class ChiSVM(object):
 
 
     # Generate a new DAta Set using only the features in the list
-    def reduce(self, data, features, labels={}):
+    def reduce(self, data, features):
         X = []
-        y = []
-        for  i in data:
+        for i in range(0, len(data)):
             row = []
             for f in features:
                 row.append(data[i][f])
             X.append(row)
-            y.append(labels.get(i))
 
-        return X, y
+        return X
 
 
     def chiSqr(self, X, y, k):
@@ -37,10 +35,10 @@ class ChiSVM(object):
           # Contingency table for the distribution
           crosstab = [[1, 1], [1, 1], [1, 1]]
 
-          for i in X:
+          for i in range(0, len(X)):
             
             #Extract the label for the Vector
-            label = int(y.get(i))
+            label = int(y[i])
 
             if label == 0:
 
@@ -147,19 +145,31 @@ def readLabels(filename, flat=False):
 # unclassified (test data)
 def splitData(data, labels):
 
-    training = {}
-    test = {}
+    # Labels
+    y = []
+
+    # Training data
+    X = []
+
+    # Test data
+    t = []
+
+    # Numerical position of the training data if in the single dataset is given.
+    tRowNum = []
 
     for i in range(0, len(data), 1):
 
-        if(labels.get(i) == None):
-            d = data[i]
-            test.setdefault(i, d)
-        else:
-            d = data[i]
-            training.setdefault(i, d)
+        label = labels.get(i)
+        if(label == None):
+            t.append(data[i])
+            tRowNum.append(i)
 
-    return {"training": training, "test": test}
+        else:
+            y.append(label)
+            X.append(data[i])
+
+    return X, y, t, tRowNum
+    #return {"training": training, "test": test, "X": X, "y": y, "t": t}
 
 
 if __name__ == "__main__":
@@ -174,39 +184,58 @@ if __name__ == "__main__":
     testdata = []
 
     # read datafile
-    data = readData(datafile)
-
-    # read labelfile
-    labels = readLabels(labelfile)
+    print('Reading Data...')
+    X = readData(datafile)
 
     # If no unclassified data is supplied, try to extract it from the initial
     # data input
     if len(sys.argv) >= 4:
-        testfile = sys.argv[3]
-        testdata = readData(testfile)
-        traindata = data
+         # read labelfile
+        print('Reading Labels...')
+        y = readLabels(labelfile, flat=True)
+
+        print('Reading Test Data...')
+        t = readData(sys.argv[3])
+    
+        # Row numbers of the training data.
+        # this is mostly so that there is no exception when attemption to access it
+        # when printing the prediction values.
+        tRowNum = list(range(0, len(t)))
     else:
-        data = splitData(data, labels)
-        testdata = data.get("test")
-        traindata = data.get("training")
+         # read labelfile
+        print('Reading Labels...')
+        y = readLabels(labelfile)
 
-    csvm = ChiSVM(traindata, labels)
+        print('Splitting Data...')
+        X, y, t, tRowNum = splitData(X, y)
 
-    features = csvm.chiSqr(traindata, labels, 15)
-   
-    X, y = csvm.reduce(traindata, features, labels)
+    csvm = ChiSVM(X, y)
+
+    print(len(X))
+    print(len(y))
+
+    print('Calculating ChiSqr...')
+    features = csvm.chiSqr(X, y, 15)
+
+    print('Features:')
+    print(features)
+    
+    X = csvm.reduce(X, features)
+    print("Reduced X")
   
     clf = LinearSVC(random_state=0)
+
+    print("Fitting...")
     clf.fit(X, y)
-    print(clf.coef_)
-    print(clf.intercept_)
+    
+    # Reduce the training data to the subset based on the feature list.
+    tX = csvm.reduce(t, features)
 
-    print(testdata)
+    print("Predicting...")
+    predictions = clf.predict(tX)
+    
+    # print(predictions)
+    # print(tRowNum)
 
-    tX, y = csvm.reduce(testdata, features)
-
-    print(tX)
-
-    print(clf.predict(tX))
-  
-    #classification = dt.classify(testdata, params)
+    for i in range(0, len(predictions)):
+        print("{} {}".format(predictions[i], tRowNum[i]))
