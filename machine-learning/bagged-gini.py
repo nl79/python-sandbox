@@ -238,7 +238,7 @@ if __name__ == "__main__":
         exit()
 
     # Number of bags to create
-    bags = 20
+    bags = 100
 
     datafile = sys.argv[1]
     labelfile = sys.argv[2]
