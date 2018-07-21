@@ -5,6 +5,7 @@ import random
 # python3 bagged-gini.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
 # perl test_error.pl bagged-gini ionosphere
 
+
 class Bag(object):
 
     def __init__(self, data, labels):
@@ -33,32 +34,39 @@ class Bag(object):
         return {'X': data, 'y': labels, 'keys': oKeys}
 
     def aggregate(self, data):
-      result = []
-      if(len(data) == 1):
+        result = []
+    #   if(len(data) == 1):
+    #     return result
+
+        totals = {}
+
+        for i in range(0, len(data)):
+            for key in data[i]:
+                val = int(data[i][key])
+                if(key in totals):
+                    totals[key].append(val)
+                else:
+                    totals.setdefault(key, [val])
+
+        keys = sorted(totals.keys())
+
+        for key in keys:
+
+            total = sum(totals[key])
+            c = ''
+
+            if(len(totals[key]) == 1):
+                c = total
+            else:
+                if(total >= math.floor(len(totals[key])/2)):
+                    c = 1
+                else:
+                    c = 0
+
+            print("{} {}".format(str(c), str(key)))
+            result.append((key, c))
+
         return result
-
-      totals = {}
-
-      for i in range(0, len(data)):
-        for key in data[i]:
-          val = int(data[i][key])
-          if(key in totals):
-            totals[key].append(val)
-          else:
-            totals.setdefault(key,[val])
-      
-      for key in totals:
-        total = sum(totals[key])
-        c = ''
-        if(total >= math.floor(len(totals[key])/2)):
-          c = 1
-        else:
-          c = 0
-      
-        print("{} {}".format(str(c), str(key)))
-        result.append((key, c))
-
-      return result
 
 
 class DecisionTree(object):
@@ -263,7 +271,6 @@ if __name__ == "__main__":
 
         # Crete a random data set with labels.
         model = bag.shuffle()
-
         # print(sorted(model['keys']))
 
         # process the model and store the labels.
