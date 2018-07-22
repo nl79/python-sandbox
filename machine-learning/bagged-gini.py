@@ -152,14 +152,26 @@ class DecisionTree(object):
                     split = i
                     temp = cData
 
-        threshold = self.threshold(temp, split)
+        t = self.threshold(temp, split)
 
-        return {"k": feature, "s": threshold}
+        # Check which labels fall into correct side of the threshold
+        l = {0: 0, 1: 0}
+
+        for i in data:
+            if(data[i][feature] < t):
+                l[label.get(i)] += 1
+
+        lt = 0 if l.get(0) > l.get(1) else 1
+        gt = 0 if l.get(0) < l.get(1) else 1
+        #print("Feature: {} | T: {}".format(feature,t))
+        return {"k": feature, "s": t, "lt": lt, 'gt': gt}
 
     def classify(self, data, params):
         k = params['k']
         s = params['s']
-
+        lt = params['lt']
+        gt = params['gt']
+        
         o = {}
 
         key = sorted(data.keys())
@@ -167,7 +179,7 @@ class DecisionTree(object):
             row = data[i]
             val = row[k]
 
-            c = "1" if val < s else "0"
+            c = lt if val < s else gt
 
             o.setdefault(i, c)
 
@@ -238,7 +250,7 @@ if __name__ == "__main__":
         exit()
 
     # Number of bags to create
-    bags = 100
+    bags = 25
 
     datafile = sys.argv[1]
     labelfile = sys.argv[2]
@@ -272,10 +284,11 @@ if __name__ == "__main__":
         # Crete a random data set with labels.
         model = bag.shuffle()
         # print(sorted(model['keys']))
-
+        
         # process the model and store the labels.
         dt = DecisionTree(model['X'], model['y'])
         params = dt.process()
+        #print(params)
         classification = dt.classify(testdata, params)
         results.append(classification)
         # print(params)

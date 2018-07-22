@@ -193,5 +193,5 @@ if __name__ == "__main__":
     params = dt.process()
     print(params)
     print("Feature: {} | Split: {}".format(params["k"], params["s"]))
-    #classification = dt.classify(testdata, params)
+    classification = dt.classify(testdata, params)
 
