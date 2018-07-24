@@ -17,103 +17,90 @@ class K_Means(object):
         for i in range(0, k):
             m.append([0]*len(data[0]))
 
+        # assign random row to each cluster.
         for j in range(0, k):
             m[j] = data[random.randrange(0, (len(data)-1))]
         
         return m
 
-    def train(self, data, k):
-        cols = len(data[0])
-        rows = len(data)
-        y = {}
-        diff = 1
-
-        m = self.initialize(data, k)
-
-        prev = [[0]*cols for x in range(k)]
-
-        dist = [0.1]*k
-
-        mdist = [0]*k
-
-        n = [0.1]*k
-
-        totaldist = 1
-        classes = []
-
-        while ((totaldist) > 0):
-            for i in range(0, rows, 1):
-
-                dist = [0.1]*k
-
-                for p in range(0, k, 1):
-                    for j in range(0, cols, 1):
-                        dist[p] += ((data[i][j] - m[p][j])**2)
-
-                for p in range(0, k, 1):
-                    dist[p] = dist[p]**0.5
-
-                mindist = min(dist)
-
-                for p in range(0, k, 1):
-                    if(dist[p]== mindist):
-                        y[i] = p
-                        n[p] += 1
-
-                        break
-
-            m = [[0]*cols for x in range(k)]
-            col = []
-
-            for i in range(0, rows, 1):
-                for p in range(0, k, 1):
-                    if(y.get(i) == p):
-                        
-                        for j in range(0, cols, 1):
-
-                            temp = m[p][j]
-                            temp1 = data[i][j]
-                            m[p][j] = temp + temp1
-
-            for j in range(0, cols, 1):
-                for i in range(0, k, 1):
-                    m[i][j] = m[i][j]/n[i]
-
-            classes = [int(x) for x in n]
-            n=[0.1]*k
-
-            mdist = [0]*k
-
-            for p in range(0, k, 1):
-                for j in range(0, cols, 1):
-                    mdist[p] += float((prev[p][j]-m[p][j])**2)
-
-                mdist[p] = (mdist[p]) ** 0.5
-
-            prev=m
-            totaldist = 0
-            for b in range(0, len(mdist), 1):
-                totaldist += mdist[b]
-
-            print ("distance:",totaldist)
-
-        print("k =",k," | Clusters: ",classes)
-
-
-    def process(self):
-        return 0
-
-    def means(self, data, k):
-        return []
-
     def distance(self, x, k):
         sm = sum([(m - n)**2 for m, n in zip(x, k)])
         return math.sqrt(sm)
 
-    def classify(self, data, w):
-        
-        return 0
+    def findCluster(self, data, m, k):
 
+        dMin = float('inf')
+        c = None
+        # Calculate the distance of the current row to all of the means
+        for j in range(0, k):
+
+            #calculate the distance to the mean
+            d = self.distance(data, m[j])
+            #print("Cluster: {} | distance: {} | min: {}".format(j, d, dMin))
+            if(d < dMin):
+                dMin = d
+                c = j
+
+        return c
+
+    def cluster(self, data, k):
+        cols = len(data[0])
+        y = {}
+
+        m = self.initialize(data, k)
+
+        # Initial means values to compares against.
+        prev = [[0]*cols for x in range(k)]
+
+        delta = 1
+    
+        while ((delta) > 0):
+
+             # Reset the counts of items in each cluster
+            n=[0.1]*k
+
+            # Calculate the distance from each row to the closest cluster
+            for i in range(0, len(data)):
+
+                # Find the closest cluster to the current row
+                c = self.findCluster(data[i], m, k)
+                
+                # Save the cluster label.
+                y[i] = c
+                n[c] += 1
+
+            # Reset/recalculate the means for each cluster
+            m = [[0]*cols for x in range(k)]
+            
+            for i in range(0, len(data)):
+                for p in range(0, k):
+
+                    if(y.get(i) == p):
+                        # Sum up the column values.
+                        for j in range(0, len(data[i])):
+                            m[p][j] += data[i][j]
+
+            
+            for i in range(0, k):
+                for j in range(0, cols):
+                    m[i][j] = m[i][j]/n[i]
+
+           
+
+            mdist = [0]*k
+
+            # Get the distance between the previous means. 
+            for p in range(0, k):
+                mdist[p] = self.distance(prev[p], m[p])
+
+            # Save the mean values of the current iteration.
+            prev=m
+
+            # Calculate the total distance to check of there is any difference between the previous 
+            # iteration
+            delta = sum(mdist)
+
+        return y
 
 # Read Data
 def readData(filename):
@@ -146,8 +133,8 @@ if __name__ == "__main__":
         k = sys.argv[2]
     
     km = K_Means(data, int(k))
-    
-    #print(km.initialize(data, int(k)))
 
-    km.train(data, int(k))
+    result = km.cluster(data, int(k))
+    for i in range(0, len(result)):
+        print("{} {}".format(result[i], i))
 
