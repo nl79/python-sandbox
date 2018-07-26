@@ -6,7 +6,7 @@ class CrossValidate(object):
   def __init__(self, X, y):
     return None
 
-  def getC(self, X, y):
+  def getC(self, X, y, s = 1):
     random.seed()
     C = [.0001, .001, .01, .1, 1, 10, 100, 1000]
     error = {}
@@ -19,7 +19,7 @@ class CrossValidate(object):
     for i in range(0, len(X)):
       ids.append(i)
 
-    splits = 5
+    splits = s
 
     for x in range(0, splits):
 
@@ -51,7 +51,6 @@ class CrossValidate(object):
 
         err = err/len(yPrime)
         error[c] += err
-        print("err=", err, 'C=', C, "split=", x)
 
     bestC = 0
     errorMin = 100
@@ -61,7 +60,9 @@ class CrossValidate(object):
       error[key] = error[key]/splits
       if(error[key] < errorMin):
         errorMin = error[key]
+        bestC = key
 
+    return bestC
 
 # Read Data
 def readData(filename):

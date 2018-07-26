@@ -1,13 +1,9 @@
 import sys
 import math
 import random
-import numpy as np
-from sklearn import svm
-
-
-# python3 bagged-gini.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
-# perl test_error.pl bagged-gini ionosphere
-
+from sklearn.svm import LinearSVC
+from validation import CrossValidate
+# python3 random-hp.py ionosphere/ionosphere.data ionosphere/ionosphere.labels
 
 class RandomHP(object):
 
@@ -123,15 +119,23 @@ def readData(filename):
 
 
 # Read Label
-def readLabels(filename):
+def readLabels(filename, flat=False):
 
     file = open(labelfile)
 
-    labels = {}
+
+    labels = {} if flat == False else []
+
     line = file.readline()
+
     while(line != ''):
         a = line.split()
-        labels[int(a[1])] = int(a[0])
+
+        if( flat == False):
+            labels[int(a[1])] = int(a[0])
+        else:
+            labels.append(int(a[0]))
+
         line = file.readline()
 
     file.close()
@@ -139,28 +143,38 @@ def readLabels(filename):
     return labels
 
 
-# Splits the input data into the classified(training data) and
 # unclassified (test data)
 def splitData(data, labels):
 
-    training = []
-    test = []
+    # Labels
+    y = []
+
+    # Training data
+    X = []
+
+    # Test data
+    t = []
+
+    # Numerical position of the training data if in the single dataset is given.
+    tRowNum = []
 
     for i in range(0, len(data), 1):
 
-        if(labels.get(i) == None):
-            test.append(data[i])
+        label = labels.get(i)
+        if(label == None):
+            t.append(data[i])
+            tRowNum.append(i)
+
         else:
-            training.append(data[i])
+            y.append(label)
+            X.append(data[i])
 
-    return {"training": training, "test": test}
-
+    return X, y, t, tRowNum
 
 if __name__ == "__main__":
     # validate parameters
     if len(sys.argv) < 3:
         exit()
-
 
     datafile = sys.argv[1]
     labelfile = sys.argv[2]
@@ -169,29 +183,70 @@ if __name__ == "__main__":
     testdata = []
 
     # read datafile
-    data = readData(datafile)
-
-    # read labelfile
-    labels = readLabels(labelfile)
+    print('Reading Data...')
+    X = readData(datafile)
 
     # If no unclassified data is supplied, try to extract it from the initial
     # data input
     if len(sys.argv) >= 4:
-        testfile = sys.argv[3]
-        testdata = readData(testfile)
-        traindata = data
+         # read labelfile
+        print('Reading Labels...')
+        y = readLabels(labelfile, flat=True)
+
+        print('Reading Test Data...')
+        t = readData(sys.argv[3])
+    
+        # Row numbers of the training data.
+        # this is mostly so that there is no exception when attemption to access it
+        # when printing the prediction values.
+        tRowNum = list(range(0, len(t)))
     else:
-        data = splitData(data, labels)
-        testdata = data.get("test")
-        traindata = data.get("training")
+         # read labelfile
+        print('Reading Labels...')
+        y = readLabels(labelfile)
+
+        print('Splitting Data...')
+        X, y, t, tRowNum = splitData(X, y)
+
+
+    Y = readLabels('ionosphere/ionosphere.labels', flat=True)
 
     hp = RandomHP()
-    Z, zPrime = hp.generate(traindata, testdata, 2)
+    Z, zPrime = hp.generate(X, t, 10000)
 
-  
-    for i in range(0, len(Z)):
-      print(Z[i])
-    print('*'*10)
-    for i in range(0, len(zPrime)):
-      print(zPrime[i])
+    cv = CrossValidate(X, y)
 
+    # get the C value for the raw data.
+    c = cv.getC(X, y);
+
+    clf = LinearSVC(C=c, max_iter=10000)
+    clf.fit(X, y)
+    prediction = clf.predict(t)
+
+    #Calculate the Error
+    error = 0
+
+    for i in range(0, len(prediction)):
+      if(prediction[i] != Y[i]):
+        error += 1
+
+    error = error/float(len(Y))
+    print("Original Data Error: ", error)
+
+
+    # Test the Generated Data
+    c = cv.getC(Z, y);
+
+    clf = LinearSVC(C=c, max_iter=10000)
+    clf.fit(Z, y)
+    prediction = clf.predict(zPrime)
+
+    #Calculate the Error
+    error = 0
+
+    for i in range(0, len(prediction)):
+      if(prediction[i] != Y[i]):
+        error += 1
+
+    error = error/float(len(Y))
+    print("New Representation Error: ", error)
