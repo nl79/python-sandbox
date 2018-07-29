@@ -7,6 +7,7 @@ import numpy as np
 
 #python3 random-hp.py breast_cancer/breast_cancer.data  breast_cancer/breast_cancer.labels breast_cancer/breast_cancer.trainlabels.0
 
+#time python3 random-hp.py ionosphere/ionosphere.data ionosphere/ionosphere.labels ionosphere/ionosphere.trainlabels.0
 class RandomHP(object):
 
     def __init__(self):
@@ -170,25 +171,30 @@ def splitData(data, labels):
     # Test data
     t = []
 
+    # Numerical position of the training data if in the single dataset is given.
+    tRowNum = []
+
     for i in range(0, len(data), 1):
 
         label = labels.get(i)
 
         if(label == None):
             t.append(data[i])
+            tRowNum.append(i)
 
         else:
             y.append(label)
             X.append(data[i])
 
-    return X, y, t
+    return X, y, t, tRowNum
 
 
 def run(X, t, y, Y, C=None):
+
   cv = CrossValidate(X, y)
 
   # get the C value for the raw data.
-  c = C if C != None else cv.getC(X, y, s=5)
+  c = C if C != None else cv.getC(X, y, s=1)
  
   clf = LinearSVC(C=c)
   clf.fit(X, y)
@@ -198,10 +204,14 @@ def run(X, t, y, Y, C=None):
   error = 0
 
   for i in range(0, len(prediction)):
-    if(prediction[i] != Y[i]):
+    
+    if(prediction[i] != Y[tRowNum[i]]):
+      #print("WRONG!: {} {}".format(prediction[i], tRowNum[i]))
       error += 1
+    
+    #print("{} {}".format(prediction[i], tRowNum[i]))
 
-  error = error/float(len(Y))
+  error = error/float(len(prediction))
   return error
 
 
@@ -229,7 +239,7 @@ if __name__ == "__main__":
     Y = readLabels(testlabel, flat=True)
 
     print('Splitting Data...')
-    X, y, t = splitData(X, y)
+    X, y, t, tRowNum = splitData(X, y)
 
     hp = RandomHP()
     Z, zPrime = hp.generate(X, t, 10000)
