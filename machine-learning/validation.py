@@ -8,7 +8,7 @@ class CrossValidate(object):
 
   def getC(self, X, y, s = 1):
     random.seed()
-    C = [.0001, .001, .01, .1, 1, 10, 100, 1000]
+    C = [.001, .01, .1, 1, 10, 100]
     error = {}
 
     for i in range(0, len(C)):
@@ -53,15 +53,16 @@ class CrossValidate(object):
         error[c] += err
 
     bestC = 0
-    errorMin = 100
-    keys = list(error.keys())
-    for i in range(0, len(keys)):
-      key = keys[i]
-      error[key] = error[key]/splits
-      if(error[key] < errorMin):
-        errorMin = error[key]
-        bestC = key
+    errorMin = float("inf")
 
+    for key in error:
+        error[key] = error[key]/splits
+        if(error[key] < errorMin):
+            errorMin = error[key]
+            bestC = key
+ 
+    print("Errors: ", error)
+    print("Min Error: {} | Best C: {}".format(errorMin, bestC))
     return bestC
 
 # Read Data
@@ -165,10 +166,6 @@ if __name__ == "__main__":
         print('Reading Test Data...')
         t = readData(sys.argv[3])
     
-        # Row numbers of the training data.
-        # this is mostly so that there is no exception when attemption to access it
-        # when printing the prediction values.
-        tRowNum = list(range(0, len(t)))
     else:
          # read labelfile
         print('Reading Labels...')

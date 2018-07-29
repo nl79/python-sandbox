@@ -3,7 +3,9 @@ import math
 import random
 from sklearn.svm import LinearSVC
 from validation import CrossValidate
-# python3 random-hp.py ionosphere/ionosphere.data ionosphere/ionosphere.labels
+import numpy as np
+
+#python3 random-hp.py breast_cancer/breast_cancer.data  breast_cancer/breast_cancer.labels breast_cancer/breast_cancer.trainlabels.0
 
 class RandomHP(object):
 
@@ -64,13 +66,14 @@ class RandomHP(object):
         a vector and so (1+sign(zi))/2 is 0 if the sign is -1 and 1 otherwise.
         '''
         for j in range(0, len(z)):
-          z[j] = self.sign(z[j] + w0)
+          z[j] = (1 + self.sign(z[j] + w0))/2
        
         '''
         Append (1+sign(zi))/2 as new column to the right end of Z
         '''
         for j in range(0, len(Z)):
           Z[j].insert(0, z[j])
+          #Z[j].append(z[j])
 
         '''
         d. Project test data X' (each row is datapoint xj) onto w. 
@@ -82,10 +85,11 @@ class RandomHP(object):
           z.append(self.dot(y[j], W))
 
         for j in range(0, len(z)):
-          z[j] = self.sign(z[j] + w0)
+          z[j] = (1 + self.sign(z[j] + w0))/2
 
         for j in range(0, len(zPrime)):
           zPrime[j].insert(0, z[j])
+          #zPrime[j].append(z[j])
 
       return [Z, zPrime]
 
@@ -121,7 +125,7 @@ def readData(filename):
 # Read Label
 def readLabels(filename, flat=False):
 
-    file = open(labelfile)
+    file = open(filename)
 
 
     labels = {} if flat == False else []
@@ -171,14 +175,37 @@ def splitData(data, labels):
 
     return X, y, t, tRowNum
 
+
+def run(X, t, y, Y, C=None):
+  cv = CrossValidate(X, y)
+
+  # get the C value for the raw data.
+  c = cv.getC(X, y, s=1)
+ 
+  clf = LinearSVC(C=c, max_iter=10000)
+  clf.fit(X, y)
+  prediction = clf.predict(t)
+
+  #Calculate the Error
+  error = 0
+
+  for i in range(0, len(prediction)):
+    if(prediction[i] != Y[i]):
+      error += 1
+
+  error = error/float(len(Y))
+  return error
+
+
 if __name__ == "__main__":
     # validate parameters
     if len(sys.argv) < 3:
         exit()
 
     datafile = sys.argv[1]
-    labelfile = sys.argv[2]
-
+    testlabel = sys.argv[2]
+    trainlabel = sys.argv[3]
+    
     traindata = []
     testdata = []
 
@@ -186,67 +213,18 @@ if __name__ == "__main__":
     print('Reading Data...')
     X = readData(datafile)
 
-    # If no unclassified data is supplied, try to extract it from the initial
-    # data input
-    if len(sys.argv) >= 4:
-         # read labelfile
-        print('Reading Labels...')
-        y = readLabels(labelfile, flat=True)
+    # read labelfile
+    print('Reading Train Labels...')
+    y = readLabels(trainlabel)
 
-        print('Reading Test Data...')
-        t = readData(sys.argv[3])
-    
-        # Row numbers of the training data.
-        # this is mostly so that there is no exception when attemption to access it
-        # when printing the prediction values.
-        tRowNum = list(range(0, len(t)))
-    else:
-         # read labelfile
-        print('Reading Labels...')
-        y = readLabels(labelfile)
+    print('Reading Test Labels...')
+    Y = readLabels(testlabel, flat=True)
 
-        print('Splitting Data...')
-        X, y, t, tRowNum = splitData(X, y)
-
-
-    Y = readLabels('ionosphere/ionosphere.labels', flat=True)
+    print('Splitting Data...')
+    X, y, t, tRowNum = splitData(X, y)
 
     hp = RandomHP()
     Z, zPrime = hp.generate(X, t, 10000)
 
-    cv = CrossValidate(X, y)
-
-    # get the C value for the raw data.
-    c = cv.getC(X, y);
-
-    clf = LinearSVC(C=c, max_iter=10000)
-    clf.fit(X, y)
-    prediction = clf.predict(t)
-
-    #Calculate the Error
-    error = 0
-
-    for i in range(0, len(prediction)):
-      if(prediction[i] != Y[i]):
-        error += 1
-
-    error = error/float(len(Y))
-    print("Original Data Error: ", error)
-
-
-    # Test the Generated Data
-    c = cv.getC(Z, y);
-
-    clf = LinearSVC(C=c, max_iter=10000)
-    clf.fit(Z, y)
-    prediction = clf.predict(zPrime)
-
-    #Calculate the Error
-    error = 0
-
-    for i in range(0, len(prediction)):
-      if(prediction[i] != Y[i]):
-        error += 1
-
-    error = error/float(len(Y))
-    print("New Representation Error: ", error)
+    print("Original Data Error: ", run(X, t, y, Y))
+    print("Modified Data Error: ", run(Z, zPrime, y, Y))

@@ -2,7 +2,7 @@ import sys
 import math
 import random
 
-# python3 k-means.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
+# python3 k-means.py ionosphere/ionosphere.data
 
 class K_Means(object):
 
@@ -129,6 +129,7 @@ if __name__ == "__main__":
 
     #get the K value
     k = 2
+
     if(len(sys.argv) == 3):
         k = sys.argv[2]
     
