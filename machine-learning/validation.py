@@ -6,6 +6,15 @@ class CrossValidate(object):
   def __init__(self, X, y):
     return None
 
+  def error(self, p, y):
+    err = 0
+    for i in range(0, len(p)):
+      if(p[i] != y[i]):
+        err += 1
+
+    err = err/len(y)
+    return err
+
   def getC(self, X, y, s = 1):
     random.seed()
     C = [.001, .01, .1, 1, 10, 100]
@@ -30,11 +39,13 @@ class CrossValidate(object):
 
       random.shuffle(ids)
 
-      for i in range(0, int(.9*len(ids))):
+      cutoff = int(.9 * len(ids))
+
+      for i in range(0, cutoff):
         newX.append(X[ids[i]])
         newY.append(y[ids[i]])
 
-      for i in range(int(.9*len(ids)), len(ids)):
+      for i in range(cutoff, len(ids)):
         xPrime.append(X[ids[i]])
         yPrime.append(y[ids[i]])
 
@@ -44,13 +55,7 @@ class CrossValidate(object):
         clf.fit(newX, newY)
         prediction = clf.predict(xPrime)
 
-        err = 0
-        for i in range(0, len(xPrime)):
-          if(prediction[i] != yPrime[i]):
-            err = err + 1
-
-        err = err/len(yPrime)
-        error[c] += err
+        error[c] += self.error(prediction, yPrime)
 
     bestC = 0
     errorMin = float("inf")
@@ -61,7 +66,7 @@ class CrossValidate(object):
             errorMin = error[key]
             bestC = key
  
-    print("Errors: ", error)
+    #print("Errors: ", error)
     print("Min Error: {} | Best C: {}".format(errorMin, bestC))
     return bestC
 

@@ -66,7 +66,14 @@ class RandomHP(object):
         a vector and so (1+sign(zi))/2 is 0 if the sign is -1 and 1 otherwise.
         '''
         for j in range(0, len(z)):
-          z[j] = (1 + self.sign(z[j] + w0))/2
+          #print("before: z[j]: {} ".format(z[j]))
+          #print('w0: {}'.format(w0))
+         
+          res = self.sign(z[j] + w0)
+          
+          z[j] = res
+          #print("res: {}".format(z[j]))
+          #print("after: z[j]: {}".format(z[j]))
        
         '''
         Append (1+sign(zi))/2 as new column to the right end of Z
@@ -85,12 +92,14 @@ class RandomHP(object):
           z.append(self.dot(y[j], W))
 
         for j in range(0, len(z)):
-          z[j] = (1 + self.sign(z[j] + w0))/2
+          #z[j] = (1 + self.sign(z[j] + w0))/2
+          res = self.sign(z[j] + w0)
+          
+          z[j] = res
 
         for j in range(0, len(zPrime)):
           zPrime[j].insert(0, z[j])
           #zPrime[j].append(z[j])
-
       return [Z, zPrime]
 
     def sign(self, x):
@@ -135,10 +144,12 @@ def readLabels(filename, flat=False):
     while(line != ''):
         a = line.split()
 
+        l = int(a[0])
+
         if( flat == False):
-            labels[int(a[1])] = int(a[0])
+            labels[int(a[1])] = l
         else:
-            labels.append(int(a[0]))
+            labels.append(l)
 
         line = file.readline()
 
@@ -159,30 +170,27 @@ def splitData(data, labels):
     # Test data
     t = []
 
-    # Numerical position of the training data if in the single dataset is given.
-    tRowNum = []
-
     for i in range(0, len(data), 1):
 
         label = labels.get(i)
+
         if(label == None):
             t.append(data[i])
-            tRowNum.append(i)
 
         else:
             y.append(label)
             X.append(data[i])
 
-    return X, y, t, tRowNum
+    return X, y, t
 
 
 def run(X, t, y, Y, C=None):
   cv = CrossValidate(X, y)
 
   # get the C value for the raw data.
-  c = cv.getC(X, y, s=1)
+  c = C if C != None else cv.getC(X, y, s=5)
  
-  clf = LinearSVC(C=c, max_iter=10000)
+  clf = LinearSVC(C=c)
   clf.fit(X, y)
   prediction = clf.predict(t)
 
@@ -221,7 +229,7 @@ if __name__ == "__main__":
     Y = readLabels(testlabel, flat=True)
 
     print('Splitting Data...')
-    X, y, t, tRowNum = splitData(X, y)
+    X, y, t = splitData(X, y)
 
     hp = RandomHP()
     Z, zPrime = hp.generate(X, t, 10000)
