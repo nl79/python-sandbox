@@ -2,9 +2,22 @@ import sys
 import math
 import random
 from sklearn.svm import LinearSVC
+from validation import CrossValidate
 
 # python3 dimensionality-reduction.py data/SNP/traindata data/SNP/truelabels.txt data/SNP/testdata
 # python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
+
+'''
+Wrong Method:
+Features:
+[9004, 3001, 27013, 15007, 7003, 999, 1000, 19009, 7000, 21010, 11005, 997, 1002, 5002, 998]
+'''
+
+'''
+Corrent Method:
+Features:
+[9004, 27013, 3001, 15007, 7003, 7000, 999, 1000, 19009, 21010, 11005, 997, 1002, 28622, 998]
+'''
 
 class ChiSVM(object):
 
@@ -171,6 +184,42 @@ def splitData(data, labels):
     return X, y, t, tRowNum
     #return {"training": training, "test": test, "X": X, "y": y, "t": t}
 
+def validate(X, Y):
+    clf = LinearSVC(random_state=0)
+    cv = CrossValidate(X, y)
+
+    print("Splitting Data...")
+    newX, newY, xPrime, yPrime = cv.split(X, Y)
+
+
+    csvm = ChiSVM(newX, newY)
+
+    print('Calculating Pearson ChiSqr...')
+    #features = csvm.chiSqr(newX, newY, 15)
+    features = [9004, 3001, 7003, 15007, 27013, 7000, 19009, 999, 1000, 21010, 11005, 997, 1002, 6999, 998]
+    print('Features:')
+    print(features)
+    
+    print("Fitting...")
+    clf.fit(csvm.reduce(newX, features), newY)
+
+    xPrime = csvm.reduce(X, features)
+    
+    print("Predicting...")
+    prediction = clf.predict(xPrime)
+
+    error = 0
+    for i in range(0, len(prediction)):
+    
+        if(prediction[i] != yPrime[i]):
+            #print("WRONG!: {} {}".format(prediction[i], tRowNum[i]))
+            error += 1
+        
+        #print("{} {}".format(prediction[i], tRowNum[i]))
+
+    error = error/float(len(prediction))
+    return error
+
 
 if __name__ == "__main__":
     # validate parameters
@@ -209,18 +258,21 @@ if __name__ == "__main__":
         print('Splitting Data...')
         X, y, t, tRowNum = splitData(X, y)
 
-    csvm = ChiSVM(X, y)
+    # csvm = ChiSVM(X, y)
 
-    print(len(X))
-    print(len(y))
-
-    print('Calculating ChiSqr...')
-    features = csvm.chiSqr(X, y, 15)
-
-    print('Features:')
-    print(features)
+    # print('Calculating Pearson ChiSqr...')
+    # features = csvm.chiSqr(X, y, 15)
     
-    X = csvm.reduce(X, features)
+    # print('Features:')
+    # print(features)
+    
+    # X = csvm.reduce(X, features)
+
+    error = validate(X, y)
+    print("Error: {}".format(error))
+
+    exit()
+
     print("Reduced X")
   
     clf = LinearSVC(random_state=0)
