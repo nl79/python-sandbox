@@ -3,7 +3,6 @@ import math
 import random
 from sklearn.svm import LinearSVC
 from validation import CrossValidate
-import numpy as np
 
 #python3 random-hp.py breast_cancer/breast_cancer.data  breast_cancer/breast_cancer.labels breast_cancer/breast_cancer.trainlabels.0
 
@@ -196,7 +195,7 @@ def run(X, t, y, Y, C=None):
   # get the C value for the raw data.
   c = C if C != None else cv.getC(X, y, s=1)
  
-  clf = LinearSVC(C=c)
+  clf = LinearSVC(C=c, max_iter=10000)
   clf.fit(X, y)
   prediction = clf.predict(t)
 

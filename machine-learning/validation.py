@@ -6,6 +6,31 @@ class CrossValidate(object):
   def __init__(self, X, y):
     return None
 
+  def split(self, X, Y, t=.9):
+    ids = []
+
+    for i in range(0, len(X)):
+      ids.append(i)
+
+    newX = []
+    newY = []
+    xPrime = []
+    yPrime = []
+
+    random.shuffle(ids)
+
+    cutoff = int(.9 * len(ids))
+
+    for i in range(0, cutoff):
+      newX.append(X[ids[i]])
+      newY.append(Y[ids[i]])
+
+    for i in range(cutoff, len(ids)):
+      xPrime.append(X[ids[i]])
+      yPrime.append(Y[ids[i]])
+
+    return newX, newY, xPrime, yPrime
+
   def error(self, p, y):
     err = 0
     for i in range(0, len(p)):
@@ -31,23 +56,8 @@ class CrossValidate(object):
     splits = s
 
     for x in range(0, splits):
-
-      newX = []
-      newY = []
-      xPrime = []
-      yPrime = []
-
-      random.shuffle(ids)
-
-      cutoff = int(.9 * len(ids))
-
-      for i in range(0, cutoff):
-        newX.append(X[ids[i]])
-        newY.append(y[ids[i]])
-
-      for i in range(cutoff, len(ids)):
-        xPrime.append(X[ids[i]])
-        yPrime.append(y[ids[i]])
+      
+      newX, newY, xPrime, yPrime = self.split(X, y)
 
       for i in range(0, len(C)):
         c = C[i]
