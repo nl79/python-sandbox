@@ -184,26 +184,25 @@ def splitData(data, labels):
     return X, y, t, tRowNum
     #return {"training": training, "test": test, "X": X, "y": y, "t": t}
 
-def validate(X, Y):
+def validate(X, Y, f= 15):
     clf = LinearSVC(random_state=0)
     cv = CrossValidate(X, y)
 
     print("Splitting Data...")
     newX, newY, xPrime, yPrime = cv.split(X, Y)
 
-
     csvm = ChiSVM(newX, newY)
 
-    print('Calculating Pearson ChiSqr...')
-    #features = csvm.chiSqr(newX, newY, 15)
-    features = [9004, 3001, 7003, 15007, 27013, 7000, 19009, 999, 1000, 21010, 11005, 997, 1002, 6999, 998]
+    print('Calculating Pearson ChiSqr for {} Features...'.format(f))
+    features = csvm.chiSqr(newX, newY, f)
+    #features = [9004, 3001, 7003, 15007, 27013, 7000, 19009, 999, 1000, 21010, 11005, 997, 1002, 6999, 998]
     print('Features:')
     print(features)
     
     print("Fitting...")
     clf.fit(csvm.reduce(newX, features), newY)
 
-    xPrime = csvm.reduce(X, features)
+    xPrime = csvm.reduce(xPrime, features)
     
     print("Predicting...")
     prediction = clf.predict(xPrime)
@@ -212,14 +211,21 @@ def validate(X, Y):
     for i in range(0, len(prediction)):
     
         if(prediction[i] != yPrime[i]):
-            #print("WRONG!: {} {}".format(prediction[i], tRowNum[i]))
             error += 1
         
-        #print("{} {}".format(prediction[i], tRowNum[i]))
-
     error = error/float(len(prediction))
-    return error
+    return error, features
 
+def iterate(X, Y, N = 20):
+    results = []
+
+    for i in range(1, N):
+        error, features = validate(X, y, i)
+        print("Error: {}".format(error))
+        print("Features: ", features)
+        results.append([error, features])
+
+    return results;
 
 if __name__ == "__main__":
     # validate parameters
@@ -258,28 +264,40 @@ if __name__ == "__main__":
         print('Splitting Data...')
         X, y, t, tRowNum = splitData(X, y)
 
-    # csvm = ChiSVM(X, y)
+    
+    
+    # Run upto N iterations of the algorithm, increasing the column count to N and generating 
+    # new errors columnd values.
+    results = iterate(X, y, 20)
+    print("Results: ", results)
+    exit()
+    
+
+
+
+    error, features = validate(X, y, 15)
+
+    print("Error: {}".format(error))
+    print("Features: ",  features)
+    
+    csvm = ChiSVM(X, y)
 
     # print('Calculating Pearson ChiSqr...')
     # features = csvm.chiSqr(X, y, 15)
     
-    # print('Features:')
-    # print(features)
+    print('Features:')
+    print(features)
     
-    # X = csvm.reduce(X, features)
+    X = csvm.reduce(X, features)
 
-    error = validate(X, y)
-    print("Error: {}".format(error))
-
-    exit()
-
-    print("Reduced X")
+    print("Reduced Training Data Set ")
   
     clf = LinearSVC(random_state=0)
 
     print("Fitting...")
     clf.fit(X, y)
     
+    print("Reduced Test Data Set...")
     # Reduce the training data to the subset based on the feature list.
     tX = csvm.reduce(t, features)
 
