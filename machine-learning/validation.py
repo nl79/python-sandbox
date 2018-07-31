@@ -77,8 +77,8 @@ class CrossValidate(object):
             bestC = key
  
     #print("Errors: ", error)
-    print("Min Error: {} | Best C: {}".format(errorMin, bestC))
-    return bestC
+    #print("Min Error: {} | Best C: {}".format(errorMin, bestC))
+    return {"C": bestC, "e": errorMin}
 
 # Read Data
 def readData(filename):
