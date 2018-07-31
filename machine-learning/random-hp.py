@@ -10,6 +10,10 @@ from validation import CrossValidate
 
 #python3 random-hp.py qsar/qsar.data qsar/qsar.labels qsar/qsar.trainlabels.0
 
+#python3 random-hp.py climate/climate.data climate/climate.labels climate/climate.trainlabels.0
+
+#python3 random-hp.py micromass/micromass.data micromass/micromass.labels micromass/micromass.trainlabels.0
+
 
 class RandomHP(object):
 
@@ -197,8 +201,14 @@ def run(X, t, y, Y, C=None):
   cv = CrossValidate(X, y)
 
   # get the C value for the raw data.
-  c = C if C != None else cv.getC(X, y, s=5)
- 
+  c = C
+
+  if(c == None):
+    res = cv.getC(X, y, s=5)
+    c = res["C"]
+  
+  print("C: {}".format(c))
+
   clf = LinearSVC(C=c, max_iter=10000)
   clf.fit(X, y)
   prediction = clf.predict(t)
@@ -246,8 +256,19 @@ if __name__ == "__main__":
 
     k = [10, 100, 1000, 10000]
 
-    hp = RandomHP()
-    Z, zPrime = hp.generate(X, t, 10000)
+    for i in k:
+      print("K: {}".format(i))
 
-    print("Original Data Error: ", run(X, t, y, Y))
-    print("Modified Data Error: ", run(Z, zPrime, y, Y))
+      print("Original Data Error: ", run(X, t, y, Y))
+
+      hp = RandomHP()
+      Z, zPrime = hp.generate(X, t, i)
+
+      print("Modified Data Error: ", run(Z, zPrime, y, Y))
+
+
+    # hp = RandomHP()
+    # Z, zPrime = hp.generate(X, t, 10000)
+
+    # print("Original Data Error: ", run(X, t, y, Y))
+    # print("Modified Data Error: ", run(Z, zPrime, y, Y))

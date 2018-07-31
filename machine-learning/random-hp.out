@@ -24,68 +24,91 @@ Modified Data Error:  0.05555555555555555
 Breast Cancer
 
 K: 10
-C: 10
-Original Data Error:  0.034482758620689655
-C: 0.01
-Modified Data Error:  0.08620689655172414
+C: 1
+Original Data Error:  0.1206896551724138
+C: 0.001
+Modified Data Error:  0.3793103448275862
 K: 100
-C: 0.1
-Original Data Error:  0.017241379310344827
-C: 10
-Modified Data Error:  0.1206896551724138
+C: 0.001
+Original Data Error:  0.05172413793103448
+C: 0.01
+Modified Data Error:  0.3103448275862069
 K: 1000
 C: 0.001
 Original Data Error:  0.05172413793103448
 C: 0.1
-Modified Data Error:  0.05172413793103448
+Modified Data Error:  0.08620689655172414
 K: 10000
-C: 0.001
-Original Data Error:  0.05172413793103448
 C: 0.01
-Modified Data Error:  0.06896551724137931
+Original Data Error:  0.1206896551724138
+C: 0.01
+Modified Data Error:  0.05172413793103448
 
 Qsar
 
 K: 10
-C: 0.1
-Original Data Error:  0.12264150943396226
-C: 0.001
-Modified Data Error:  0.08490566037735849
-K: 100
-C: 0.1
-Original Data Error:  0.12264150943396226
-C: 0.001
-Modified Data Error:  0.11320754716981132
-K: 1000
-C: 0.1
-Original Data Error:  0.11320754716981132
-C: 0.001
-Modified Data Error:  0.08490566037735849
-K: 10000
 C: 0.01
 Original Data Error:  0.12264150943396226
 C: 0.001
-Modified Data Error:  0.09433962264150944
+Modified Data Error:  0.33962264150943394
+K: 100
+C: 0.01
+Original Data Error:  0.12264150943396226
+C: 0.01
+Modified Data Error:  0.29245283018867924
+K: 1000
+C: 0.1
+Original Data Error:  0.12264150943396226
+C: 0.01
+Modified Data Error:  0.12264150943396226
+K: 10000
+C: 0.1
+Original Data Error:  0.12264150943396226
+C: 0.001
+Modified Data Error:  0.08490566037735849
 
 Climate
 
 K: 10
-C: 1
-Original Data Error:  0.01818181818181818
-C: 0.01
-Modified Data Error:  0.03636363636363636
+C: 10
+Original Data Error:  0.03636363636363636
+C: 0.001
+Modified Data Error:  0.09090909090909091
 K: 100
 C: 1
 Original Data Error:  0.01818181818181818
-C: 0.01
-Modified Data Error:  0.03636363636363636
+C: 1
+Modified Data Error:  0.07272727272727272
 K: 1000
 C: 10
 Original Data Error:  0.03636363636363636
 C: 0.01
-Modified Data Error:  0.03636363636363636
+Modified Data Error:  0.09090909090909091
 K: 10000
-C: 1
-Original Data Error:  0.01818181818181818
-C: 0.01
+C: 100
+Original Data Error:  0.05454545454545454
+C: 0.1
 Modified Data Error:  0.03636363636363636
+
+Micromass
+
+K: 10
+C: 0.001
+Original Data Error:  0.031914893617021274
+C: 0.001
+Modified Data Error:  0.3829787234042553
+K: 100
+C: 0.001
+Original Data Error:  0.031914893617021274
+C: 0.01
+Modified Data Error:  0.32978723404255317
+K: 1000
+C: 0.001
+Original Data Error:  0.031914893617021274
+C: 0.01
+Modified Data Error:  0.09574468085106383
+K: 10000
+C: 0.001
+Original Data Error:  0.031914893617021274
+C: 0.001
+Modified Data Error:  0.02127659574468085
