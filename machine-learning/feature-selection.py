@@ -222,8 +222,8 @@ def validate(X, Y, f= 15):
     print('Calculating Pearson ChiSqr for {} Features...'.format(f))
     features = csvm.chiSqr(newX, newY, f)
     #features = [9004, 3001, 7003, 15007, 27013, 7000, 19009, 999, 1000, 21010, 11005, 997, 1002, 6999, 998]
-    print('Features:')
-    print(features)
+    # print('Features:')
+    # print(features)
     
     print("Fitting...")
     clf.fit(csvm.reduce(newX, features), newY)
@@ -304,13 +304,7 @@ if __name__ == "__main__":
     print("Features: ",  features)
     
     csvm = ChiSVM(X, y)
-
-    # print('Calculating Pearson ChiSqr...')
-    # features = csvm.chiSqr(X, y, 15)
-    
-    print('Features:')
-    print(features)
-    
+        
     X = csvm.reduce(X, features)
 
     print("Reduced Training Data Set ")
