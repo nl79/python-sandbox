@@ -7,6 +7,10 @@ from validation import CrossValidate
 #python3 random-hp.py breast_cancer/breast_cancer.data  breast_cancer/breast_cancer.labels breast_cancer/breast_cancer.trainlabels.0
 
 #time python3 random-hp.py ionosphere/ionosphere.data ionosphere/ionosphere.labels ionosphere/ionosphere.trainlabels.0
+
+#python3 random-hp.py qsar/qsar.data qsar/qsar.labels qsar/qsar.trainlabels.0
+
+
 class RandomHP(object):
 
     def __init__(self):
@@ -193,7 +197,7 @@ def run(X, t, y, Y, C=None):
   cv = CrossValidate(X, y)
 
   # get the C value for the raw data.
-  c = C if C != None else cv.getC(X, y, s=1)
+  c = C if C != None else cv.getC(X, y, s=5)
  
   clf = LinearSVC(C=c, max_iter=10000)
   clf.fit(X, y)
@@ -239,6 +243,8 @@ if __name__ == "__main__":
 
     print('Splitting Data...')
     X, y, t, tRowNum = splitData(X, y)
+
+    k = [10, 100, 1000, 10000]
 
     hp = RandomHP()
     Z, zPrime = hp.generate(X, t, 10000)
