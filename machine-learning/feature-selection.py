@@ -4,8 +4,7 @@ import random
 from sklearn.svm import LinearSVC
 from validation import CrossValidate
 
-# python3 dimensionality-reduction.py data/SNP/traindata data/SNP/truelabels.txt data/SNP/testdata
-# python3 dimensionality-reduction.py ionosphere/ionosphere.data ionosphere/ionosphere.trainlabels.0
+# python3 feature-selection.py data/SNP/traindata data/SNP/truelabels.txt data/SNP/testdata
 
 '''
 Wrong Method:
@@ -293,15 +292,12 @@ if __name__ == "__main__":
 
     
     
-    # Run upto N iterations of the algorithm, increasing the column count to N and generating 
-    # new errors columnd values.
-    results = iterate(X, y, 20)
-    print("Results: ", results)
-    exit()
+    # # Run upto N iterations of the algorithm, increasing the column count to N and generating 
+    # # new errors columnd values.
+    # results = iterate(X, y, 20)
+    # print("Results: ", results)
+    # exit()
     
-
-
-
     error, features = validate(X, y, 15)
 
     print("Error: {}".format(error))
